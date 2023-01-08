@@ -3,34 +3,30 @@
 	"id": "autoslabs",
 	"version": "${version}",
 	"name": "Auto Slabs",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Automatically Generate vertical slabs for every instance of SlabBlock",
 	"authors": [
-		"Me!"
+		"Andrew6rant (Andrew Grant)"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/autoslabs/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"io.github.andrew6rant.autoslabs.ExampleMod"
+			"io.github.andrew6rant.autoslabs.AutoSlabs"
 		],
 		"client": [
-			"io.github.andrew6rant.autoslabs.ExampleModClient"
+			"io.github.andrew6rant.autoslabs.AutoSlabsClient"
 		],
 		"fabric-datagen": [
-			"io.github.andrew6rant.autoslabs.ExampleModDataGenerator"
+			"io.github.andrew6rant.autoslabs.AutoSlabsDataGenerator"
 		]
 	},
 	"mixins": [
-		"autoslabs.mixins.json",
-		{
-			"config": "autoslabs.client.mixins.json",
-			"environment": "client"
-		}
+		"autoslabs.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.14.12",
