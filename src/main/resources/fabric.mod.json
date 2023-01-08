@@ -1,0 +1,44 @@
+{
+	"schemaVersion": 1,
+	"id": "autoslabs",
+	"version": "${version}",
+	"name": "Auto Slabs",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/autoslabs/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"io.github.andrew6rant.autoslabs.ExampleMod"
+		],
+		"client": [
+			"io.github.andrew6rant.autoslabs.ExampleModClient"
+		],
+		"fabric-datagen": [
+			"io.github.andrew6rant.autoslabs.ExampleModDataGenerator"
+		]
+	},
+	"mixins": [
+		"autoslabs.mixins.json",
+		{
+			"config": "autoslabs.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.14.12",
+		"minecraft": "~1.19.3",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
