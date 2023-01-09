@@ -20,9 +20,6 @@
 		],
 		"client": [
 			"io.github.andrew6rant.autoslabs.AutoSlabsClient"
-		],
-		"fabric-datagen": [
-			"io.github.andrew6rant.autoslabs.AutoSlabsDataGenerator"
 		]
 	},
 	"mixins": [
@@ -30,7 +27,7 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.14.12",
-		"minecraft": "~1.19.3",
+		"minecraft": "1.19.x",
 		"java": ">=17",
 		"fabric-api": "*",
 		"statement": ">=4.2.5"

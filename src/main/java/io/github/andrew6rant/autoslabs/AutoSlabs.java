@@ -4,17 +4,13 @@ import net.devtech.arrp.api.RRPCallback;
 import net.devtech.arrp.api.RuntimeResourcePack;
 import net.devtech.arrp.json.blockstate.JState;
 import net.devtech.arrp.json.blockstate.JVariant;
-import net.devtech.arrp.json.models.JModel;
 import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.SlabBlock;
-import net.minecraft.registry.Registries;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.Identifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.minecraft.util.registry.Registry;
 import virtuoel.statement.api.StateRefresher;
 
 public class AutoSlabs implements ModInitializer {
@@ -22,9 +18,9 @@ public class AutoSlabs implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		for (Block block : Registries.BLOCK) {
+		for (Block block : Registry.BLOCK) {
 			if (block instanceof SlabBlock) {
-				Identifier id = Registries.BLOCK.getId(block);
+				Identifier id = Registry.BLOCK.getId(block);
 				String namespace = id.getNamespace();
 				String path = id.getPath();
 				StateRefresher.INSTANCE.addBlockProperty(block, EnumProperty.of("vertical_type", VerticalType.class), VerticalType.FALSE);
