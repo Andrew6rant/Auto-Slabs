@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "type=bottom,vertical_type=north_south": {
+      "model": "minecraft:block/polished_andesite_slab",
+        "x": 90
+    },
+    "type=bottom,vertical_type=east_west": {
+      "model": "minecraft:block/polished_andesite_slab",
+      "x": 90,
+      "y": 90
+    },
+    "type=double,vertical_type=north_south": {
+      "model": "minecraft:block/polished_andesite",
+      "x": 90
+    },
+    "type=double,vertical_type=east_west": {
+      "model": "minecraft:block/polished_andesite",
+      "y": 90
+    },
+    "type=top,vertical_type=north_south": {
+      "model": "minecraft:block/polished_andesite_slab_top",
+      "x": 90
+    },
+    "type=top,vertical_type=east_west": {
+      "model": "minecraft:block/polished_andesite_slab_top",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

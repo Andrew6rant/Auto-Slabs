@@ -26,19 +26,19 @@ public class AutoSlabs implements ModInitializer {
 		for (Block block : Registries.BLOCK) {
 			if (block instanceof SlabBlock) {
 				StateRefresher.INSTANCE.addBlockProperty(block, EnumProperty.of("vertical_type", VerticalType.class), VerticalType.FALSE);
-				System.out.println("Added vertical_type property to " + block+", "+block.getLootTableId()+", "+block.getTranslationKey()+", "+block.getLootTableId().getPath());
-				AUTO_SLABS_RESOURCES.addModel(JModel.model("autoslabs:block/template_bottom_vertical").textures(JModel.textures().var("texture", block.getTranslationKey())), new Identifier(block.getLootTableId()+"_bottom_vertical"));
-				AUTO_SLABS_RESOURCES.addModel(JModel.model("autoslabs:block/template_top_vertical").textures(JModel.textures().var("texture", block.getTranslationKey())), new Identifier(block.getLootTableId()+"_top_vertical"));
+				System.out.println("Added vertical_type property to " + block.getRegistryEntry()+", "+block.getLootTableId()+", "+block.getLootTableId().getPath());
+				//AUTO_SLABS_RESOURCES.addModel(JModel.model("autoslabs:block/template_bottom_vertical").textures(JModel.textures().var("texture", block.getTranslationKey())), new Identifier(block.getLootTableId()+"_bottom_vertical"));
+				//AUTO_SLABS_RESOURCES.addModel(JModel.model("autoslabs:block/template_top_vertical").textures(JModel.textures().var("texture", block.getTranslationKey())), new Identifier(block.getLootTableId()+"_top_vertical"));
 				AUTO_SLABS_RESOURCES.addBlockState(JState.state(new JVariant()
-						.put("type=bottom,vertical_type=north_south", JState.model(MOD_ID+block.getLootTableId().getPath()+"_bottom_vertical"))
-						.put("type=bottom,vertical_type=east_west", JState.model(MOD_ID+block.getLootTableId().getPath()+"_bottom_vertical").y(90))
-						.put("type=top,vertical_type=north_south", JState.model(MOD_ID+block.getLootTableId().getPath()+"_top_vertical"))
-						.put("type=top,vertical_type=east_west", JState.model(MOD_ID+block.getLootTableId().getPath()+"_top_vertical").y(90))
+						.put("type=bottom,vertical_type=north_south", JState.model(block.getLootTableId()).x(90))
+						.put("type=bottom,vertical_type=east_west", JState.model(block.getLootTableId()).x(90).y(90))
+						.put("type=top,vertical_type=north_south", JState.model(block.getLootTableId()+"_top").x(90))
+						.put("type=top,vertical_type=east_west", JState.model(block.getLootTableId()+"_top").x(90).y(90))
 				), block.getLootTableId());
 
 			}
 		}
 		StateRefresher.INSTANCE.reorderBlockStates();
-		RRPCallback.EVENT.register(a -> a.add(AUTO_SLABS_RESOURCES));
+		RRPCallback.BEFORE_VANILLA.register(a -> a.add(AUTO_SLABS_RESOURCES));
 	}
 }
