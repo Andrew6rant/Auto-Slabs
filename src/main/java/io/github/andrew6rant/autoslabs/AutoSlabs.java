@@ -2,8 +2,11 @@ package io.github.andrew6rant.autoslabs;
 
 import net.fabricmc.api.ModInitializer;
 
+import net.minecraft.block.Blocks;
+import net.minecraft.state.property.EnumProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import virtuoel.statement.api.StateRefresher;
 
 public class AutoSlabs implements ModInitializer {
 	// This logger is used to write text to the console and the log file.
@@ -13,8 +16,7 @@ public class AutoSlabs implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		// This code runs as soon as Minecraft is in a mod-load-ready state.
-		// However, some things (like resources) may still be uninitialized.
-		// Proceed with mild caution.
+		StateRefresher.INSTANCE.addBlockProperty(Blocks.OAK_SLAB, EnumProperty.of("vertical_type", VerticalType.class), VerticalType.FALSE);
+		StateRefresher.INSTANCE.reorderBlockStates();
 	}
 }
