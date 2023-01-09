@@ -20,6 +20,9 @@ repositories {
     maven {
         url = "https://jitpack.io"
     }
+    maven {
+        url = uri("https://storage.googleapis.com/devan-maven/")
+    }
 }
 
 loom {
@@ -71,6 +74,7 @@ dependencies {
     modApi("com.github.Virtuoel:Statement:${project.statement_version}", {
         exclude group: "net.fabricmc.fabric-api"
     })
+    modImplementation("net.devtech:arrp:${project.arrp_version}")
 }
 
 processResources {
