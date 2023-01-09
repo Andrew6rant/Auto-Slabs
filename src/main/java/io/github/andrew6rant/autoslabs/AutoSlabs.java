@@ -2,7 +2,10 @@ package io.github.andrew6rant.autoslabs;
 
 import net.fabricmc.api.ModInitializer;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.SlabBlock;
+import net.minecraft.registry.Registries;
 import net.minecraft.state.property.EnumProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +19,11 @@ public class AutoSlabs implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		StateRefresher.INSTANCE.addBlockProperty(Blocks.OAK_SLAB, EnumProperty.of("vertical_type", VerticalType.class), VerticalType.FALSE);
+		for (Block block : Registries.BLOCK) {
+			if (block instanceof SlabBlock) {
+				StateRefresher.INSTANCE.addBlockProperty(block, EnumProperty.of("vertical_type", VerticalType.class), VerticalType.FALSE);
+			}
+		}
 		StateRefresher.INSTANCE.reorderBlockStates();
 	}
 }
