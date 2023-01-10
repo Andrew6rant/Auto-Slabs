@@ -7,7 +7,7 @@
       "model": "minecraft:block/oak_slab"
     },
     "type=bottom,vertical_type=north_south": {
-      "model": "autoslabs:block/vertical_oak_slab_bottom"
+      "model": "autoslabs:block/vertical_slab_north_south_top"
     },
     "type=bottom,vertical_type=east_west": {
       "model": "autoslabs:block/vertical_oak_slab_bottom",
