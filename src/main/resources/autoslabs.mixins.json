@@ -5,6 +5,9 @@
 	"mixins": [
 		"SlabBlockMixin"
 	],
+	"client": [
+		"WorldRendererMixin"
+	],
 	"injectors": {
 		"defaultRequire": 1
 	}
