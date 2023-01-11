@@ -24,7 +24,7 @@ public class RenderUtil {
 
     public static void renderOverlay(MatrixStack matrices, Camera camera) {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
-        if (Block.getBlockFromItem(player.getStackInHand(player.getActiveHand()).getItem()) instanceof SlabBlock || Block.getBlockFromItem(player.getOffHandStack().getItem()) instanceof SlabBlock) {
+        if (Block.getBlockFromItem(player.getStackInHand(player.getActiveHand()).getItem()) instanceof SlabBlock || (Block.getBlockFromItem(player.getOffHandStack().getItem()) instanceof SlabBlock && player.getMainHandStack().isEmpty())) {
 
             HitResult hitResult = MinecraftClient.getInstance().crosshairTarget;
 
