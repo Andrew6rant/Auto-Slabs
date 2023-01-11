@@ -57,7 +57,7 @@ public class RenderUtil {
 
     private static void drawLine(MatrixStack.Entry entry, BufferBuilder buffer, Vec3d camDif, Vector3f start, Vector3f end) {
         Vector3f normal = getNormalAngle(start, end);
-        float r = 1;
+        float r = 0;
         float g = 0;
         float b = 0;
         float a = 0.5f;
@@ -152,13 +152,6 @@ public class RenderUtil {
         }
         //@formatter:on
 
-        switch (part) {
-            case CENTER -> drawQuad(vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopRight, vecCenterTopLeft, camDif, matrixStack);
-            case BOTTOM -> drawQuad(vecBottomLeft, vecBottomRight, vecCenterBottomRight, vecCenterBottomLeft, camDif, matrixStack);
-            case TOP -> drawQuad(vecTopLeft, vecTopRight, vecCenterTopRight, vecCenterTopLeft, camDif, matrixStack);
-            case LEFT -> drawQuad(vecBottomLeft, vecTopLeft, vecCenterTopLeft, vecCenterBottomLeft, camDif, matrixStack);
-            case RIGHT -> drawQuad(vecBottomRight, vecTopRight, vecCenterTopRight, vecCenterBottomRight, camDif, matrixStack);
-        }
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -167,29 +160,38 @@ public class RenderUtil {
 
         MatrixStack.Entry entry = matrixStack.peek();
 
-        RenderSystem.lineWidth(1.5f);
+        RenderSystem.lineWidth(4f);
 
-        //outer square
-        drawLine(entry, buffer, camDif, vecBottomLeft, vecBottomRight);
-        drawLine(entry, buffer, camDif, vecBottomLeft, vecTopLeft);
-        drawLine(entry, buffer, camDif, vecBottomRight, vecTopRight);
-        drawLine(entry, buffer, camDif, vecTopLeft, vecTopRight);
-
-        //inner square
-        drawLine(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight);
-        drawLine(entry, buffer, camDif, vecCenterBottomLeft, vecCenterTopLeft);
-        drawLine(entry, buffer, camDif, vecCenterBottomRight, vecCenterTopRight);
-        drawLine(entry, buffer, camDif, vecCenterTopLeft, vecCenterTopRight);
-
-        //outer to center
-        drawLine(entry, buffer, camDif, vecBottomLeft, vecCenterBottomLeft);
-        drawLine(entry, buffer, camDif, vecBottomRight, vecCenterBottomRight);
-        drawLine(entry, buffer, camDif, vecTopLeft, vecCenterTopLeft);
-        drawLine(entry, buffer, camDif, vecTopRight, vecCenterTopRight);
+        // I have no idea why, but this code only works when
+        // in an if chain and not a switch statement
+        if (part == HitPart.CENTER) {
+            drawLine(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight);
+            drawLine(entry, buffer, camDif, vecCenterBottomLeft, vecCenterTopLeft);
+            drawLine(entry, buffer, camDif, vecCenterBottomRight, vecCenterTopRight);
+            drawLine(entry, buffer, camDif, vecCenterTopLeft, vecCenterTopRight);
+        }
+        else if (part == HitPart.BOTTOM) {
+            drawLine(entry, buffer, camDif, vecBottomLeft, vecCenterBottomLeft);
+            drawLine(entry, buffer, camDif, vecBottomRight, vecCenterBottomRight);
+            drawLine(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight);
+        }
+        else if (part == HitPart.TOP) {
+            drawLine(entry, buffer, camDif, vecTopLeft, vecCenterTopLeft);
+            drawLine(entry, buffer, camDif, vecTopRight, vecCenterTopRight);
+            drawLine(entry, buffer, camDif, vecCenterTopLeft, vecCenterTopRight);
+        }
+        else if (part == HitPart.LEFT) {
+            drawLine(entry, buffer, camDif, vecBottomLeft, vecCenterBottomLeft);
+            drawLine(entry, buffer, camDif, vecTopLeft, vecCenterTopLeft);
+            drawLine(entry, buffer, camDif, vecCenterBottomLeft, vecCenterTopLeft);
+        }
+        else if (part == HitPart.RIGHT) {
+            drawLine(entry, buffer, camDif, vecBottomRight, vecCenterBottomRight);
+            drawLine(entry, buffer, camDif, vecTopRight, vecCenterTopRight);
+            drawLine(entry, buffer, camDif, vecCenterBottomRight, vecCenterTopRight);
+        }
 
         tessellator.draw();
-
-
     }
 
     public static HitPart getHitPart(BlockHitResult hit) {
