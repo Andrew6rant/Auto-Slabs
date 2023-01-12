@@ -3,11 +3,14 @@ package io.github.andrew6rant.autoslabs;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.SlabBlock;
+import net.minecraft.block.enums.SlabType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -21,6 +24,10 @@ import java.util.Optional;
 
 // massive thanks to Schauweg for much of this code
 public class RenderUtil {
+    private static final EnumProperty<VerticalType> VERTICAL_TYPE;
+    static {
+        VERTICAL_TYPE = EnumProperty.of("vertical_type", VerticalType.class);
+    }
 
     public static void renderOverlay(MatrixStack matrices, Camera camera) {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
@@ -33,7 +40,7 @@ public class RenderUtil {
                 BlockHitResult result = (BlockHitResult) hitResult;
                 HitPart part = getHitPart(result);
 
-                Vec3d camDif = getCameraOffset(camera.getPos(), result.getBlockPos());
+                Vec3d camDif = getCameraOffset(camera.getPos(), result.getBlockPos(), result.getSide());
 
                 RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
                 RenderSystem.lineWidth(2);
@@ -152,46 +159,93 @@ public class RenderUtil {
         }
         //@formatter:on
 
-
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
-        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
-
-        MatrixStack.Entry entry = matrixStack.peek();
-
-        RenderSystem.lineWidth(4f);
-
+        //System.out.println(side);
         // I have no idea why, but this code only works when
         // in an if chain and not a switch statement
         if (part == HitPart.CENTER) {
+
+            drawQuad(vecBottomLeft, vecBottomRight, vecCenterBottomRight, vecCenterBottomLeft, camDif, matrixStack);
+            drawQuad(vecTopLeft, vecTopRight, vecCenterTopRight, vecCenterTopLeft, camDif, matrixStack);
+            drawQuad(vecBottomLeft, vecTopLeft, vecCenterTopLeft, vecCenterBottomLeft, camDif, matrixStack);
+            drawQuad(vecBottomRight, vecTopRight, vecCenterTopRight, vecCenterBottomRight, camDif, matrixStack);
+
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder buffer = tessellator.getBuffer();
+            buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
+            MatrixStack.Entry entry = matrixStack.peek();
+            RenderSystem.lineWidth(3.5f);
             drawLine(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight);
             drawLine(entry, buffer, camDif, vecCenterBottomLeft, vecCenterTopLeft);
             drawLine(entry, buffer, camDif, vecCenterBottomRight, vecCenterTopRight);
             drawLine(entry, buffer, camDif, vecCenterTopLeft, vecCenterTopRight);
+            tessellator.draw();
         }
         else if (part == HitPart.BOTTOM) {
+            drawQuad(vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopRight, vecCenterTopLeft, camDif, matrixStack);
+            drawQuad(vecTopLeft, vecTopRight, vecCenterTopRight, vecCenterTopLeft, camDif, matrixStack);
+            drawQuad(vecBottomLeft, vecTopLeft, vecCenterTopLeft, vecCenterBottomLeft, camDif, matrixStack);
+            drawQuad(vecBottomRight, vecTopRight, vecCenterTopRight, vecCenterBottomRight, camDif, matrixStack);
+
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder buffer = tessellator.getBuffer();
+            buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
+            MatrixStack.Entry entry = matrixStack.peek();
+            RenderSystem.lineWidth(3.5f);
             drawLine(entry, buffer, camDif, vecBottomLeft, vecCenterBottomLeft);
             drawLine(entry, buffer, camDif, vecBottomRight, vecCenterBottomRight);
             drawLine(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight);
+            tessellator.draw();
         }
         else if (part == HitPart.TOP) {
+            drawQuad(vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopRight, vecCenterTopLeft, camDif, matrixStack);
+            drawQuad(vecBottomLeft, vecBottomRight, vecCenterBottomRight, vecCenterBottomLeft, camDif, matrixStack);
+            drawQuad(vecBottomLeft, vecTopLeft, vecCenterTopLeft, vecCenterBottomLeft, camDif, matrixStack);
+            drawQuad(vecBottomRight, vecTopRight, vecCenterTopRight, vecCenterBottomRight, camDif, matrixStack);
+
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder buffer = tessellator.getBuffer();
+            buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
+            MatrixStack.Entry entry = matrixStack.peek();
+            RenderSystem.lineWidth(3.5f);
             drawLine(entry, buffer, camDif, vecTopLeft, vecCenterTopLeft);
             drawLine(entry, buffer, camDif, vecTopRight, vecCenterTopRight);
             drawLine(entry, buffer, camDif, vecCenterTopLeft, vecCenterTopRight);
+            tessellator.draw();
         }
         else if (part == HitPart.LEFT) {
+            drawQuad(vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopRight, vecCenterTopLeft, camDif, matrixStack);
+            drawQuad(vecBottomLeft, vecBottomRight, vecCenterBottomRight, vecCenterBottomLeft, camDif, matrixStack);
+            drawQuad(vecTopLeft, vecTopRight, vecCenterTopRight, vecCenterTopLeft, camDif, matrixStack);
+            drawQuad(vecBottomRight, vecTopRight, vecCenterTopRight, vecCenterBottomRight, camDif, matrixStack);
+
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder buffer = tessellator.getBuffer();
+            buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
+            MatrixStack.Entry entry = matrixStack.peek();
+            RenderSystem.lineWidth(3.5f);
             drawLine(entry, buffer, camDif, vecBottomLeft, vecCenterBottomLeft);
             drawLine(entry, buffer, camDif, vecTopLeft, vecCenterTopLeft);
             drawLine(entry, buffer, camDif, vecCenterBottomLeft, vecCenterTopLeft);
+            tessellator.draw();
         }
         else if (part == HitPart.RIGHT) {
+            drawQuad(vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopRight, vecCenterTopLeft, camDif, matrixStack);
+            drawQuad(vecBottomLeft, vecBottomRight, vecCenterBottomRight, vecCenterBottomLeft, camDif, matrixStack);
+            drawQuad(vecTopLeft, vecTopRight, vecCenterTopRight, vecCenterTopLeft, camDif, matrixStack);
+            drawQuad(vecBottomLeft, vecTopLeft, vecCenterTopLeft, vecCenterBottomLeft, camDif, matrixStack);
+
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder buffer = tessellator.getBuffer();
+            buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
+            MatrixStack.Entry entry = matrixStack.peek();
+            RenderSystem.lineWidth(3.5f);
             drawLine(entry, buffer, camDif, vecBottomRight, vecCenterBottomRight);
             drawLine(entry, buffer, camDif, vecTopRight, vecCenterTopRight);
             drawLine(entry, buffer, camDif, vecCenterBottomRight, vecCenterTopRight);
+            tessellator.draw();
         }
 
-        tessellator.draw();
+
     }
 
     public static HitPart getHitPart(BlockHitResult hit) {
@@ -241,10 +295,45 @@ public class RenderUtil {
      * @param pos    Position to get difference
      * @return Difference
      */
-    public static Vec3d getCameraOffset(Vec3d camera, BlockPos pos) {
+    public static Vec3d getCameraOffset(Vec3d camera, BlockPos pos, Direction side) {
+        BlockState state = MinecraftClient.getInstance().world.getBlockState(pos);
         double xDif = (double) pos.getX() - camera.x;
         double yDif = (double) pos.getY() - camera.y;
         double zDif = (double) pos.getZ() - camera.z;
+        if (state.getBlock() instanceof SlabBlock) {
+            switch (side) {
+                case UP -> {
+                    if ((state.get(SlabBlock.TYPE) == SlabType.BOTTOM) && (state.get(VERTICAL_TYPE) == VerticalType.FALSE)) {
+                        yDif -= 0.5d;
+                    }
+                }
+                case DOWN -> {
+                    if ((state.get(SlabBlock.TYPE) == SlabType.TOP) && (state.get(VERTICAL_TYPE) == VerticalType.FALSE)) {
+                        yDif += 0.5d;
+                    }
+                }
+                case NORTH -> {
+                    if ((state.get(VERTICAL_TYPE) == VerticalType.NORTH_SOUTH) && (state.get(SlabBlock.TYPE) == SlabType.BOTTOM)) {
+                        zDif += 0.5d;
+                    }
+                }
+                case SOUTH -> {
+                    if ((state.get(VERTICAL_TYPE) == VerticalType.NORTH_SOUTH) && (state.get(SlabBlock.TYPE) == SlabType.TOP)) {
+                        zDif -= 0.5d;
+                    }
+                }
+                case WEST -> {
+                    if ((state.get(VERTICAL_TYPE) == VerticalType.EAST_WEST) && (state.get(SlabBlock.TYPE) == SlabType.TOP)) {
+                        xDif += 0.5d;
+                    }
+                }
+                case EAST -> {
+                    if ((state.get(VERTICAL_TYPE) == VerticalType.EAST_WEST) && (state.get(SlabBlock.TYPE) == SlabType.BOTTOM)) {
+                        xDif -= 0.5d;
+                    }
+                }
+            }
+        }
         return new Vec3d(xDif, yDif, zDif);
     }
 
@@ -262,10 +351,10 @@ public class RenderUtil {
 
         buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
-        buffer.vertex(position, pos1Raw.x, pos1Raw.y, pos1Raw.z).color(0f, 0f, 1f, 0.5f).next();
-        buffer.vertex(position, pos2Raw.x, pos2Raw.y, pos2Raw.z).color(0f, 0f, 1f, 0.5f).next();
-        buffer.vertex(position, pos3Raw.x, pos3Raw.y, pos3Raw.z).color(0f, 0f, 1f, 0.5f).next();
-        buffer.vertex(position, pos4Raw.x, pos4Raw.y, pos4Raw.z).color(0f, 0f, 1f, 0.5f).next();
+        buffer.vertex(position, pos1Raw.x, pos1Raw.y, pos1Raw.z).color(0f, 0f, 0f, 0.1f).next();
+        buffer.vertex(position, pos2Raw.x, pos2Raw.y, pos2Raw.z).color(0f, 0f, 0f, 0.1f).next();
+        buffer.vertex(position, pos3Raw.x, pos3Raw.y, pos3Raw.z).color(0f, 0f, 0f, 0.1f).next();
+        buffer.vertex(position, pos4Raw.x, pos4Raw.y, pos4Raw.z).color(0f, 0f, 0f, 0.1f).next();
 
         tessellator.draw();
     }
