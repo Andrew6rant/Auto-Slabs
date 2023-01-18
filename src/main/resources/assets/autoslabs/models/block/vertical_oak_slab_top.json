@@ -1,6 +1,0 @@
-{
-  "parent": "autoslabs:block/vertical_slab_top",
-  "textures": {
-    "side": "minecraft:block/oak_planks"
-  }
-}

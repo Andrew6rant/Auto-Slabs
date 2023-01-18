@@ -1,44 +1,34 @@
 package io.github.andrew6rant.autoslabs;
 
-import com.google.gson.JsonObject;
-import com.mojang.authlib.minecraft.client.MinecraftClient;
 import net.devtech.arrp.api.RRPCallback;
 import net.devtech.arrp.api.RuntimeResourcePack;
-import net.devtech.arrp.json.blockstate.JBlockModel;
 import net.devtech.arrp.json.blockstate.JState;
 import net.devtech.arrp.json.blockstate.JVariant;
 import net.devtech.arrp.json.models.JModel;
 import net.fabricmc.api.ModInitializer;
-
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.registry.Registries;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import virtuoel.statement.api.StateRefresher;
 
 public class AutoSlabs implements ModInitializer {
 	public static final RuntimeResourcePack AUTO_SLABS_RESOURCES = RuntimeResourcePack.create("autoslabs:resources");
 
-
 	@Override
 	public void onInitialize() {
-
 		for (Block block : Registries.BLOCK) {
 			if (block instanceof SlabBlock) {
 				StateRefresher.INSTANCE.addBlockProperty(block, EnumProperty.of("vertical_type", VerticalType.class), VerticalType.FALSE);
 				Identifier id = Registries.BLOCK.getId(block);
-
 				String namespace = id.getNamespace();
 				String path = id.getPath();
-				Identifier vertical_north_south_top_slab = new Identifier(namespace, path + "_vertical_north_south_top");
-				Identifier vertical_north_south_bottom_slab = new Identifier(namespace, path + "_vertical_north_south_bottom");
-				Identifier vertical_east_west_top_slab = new Identifier(namespace, path + "_vertical_east_west_top");
-				Identifier vertical_east_west_bottom_slab = new Identifier(namespace, path + "_vertical_east_west_bottom");
+				Identifier vertical_north_south_top_slab = new Identifier(namespace, "block/"+path + "_vertical_north_south_top");
+				Identifier vertical_north_south_bottom_slab = new Identifier(namespace, "block/"+path + "_vertical_north_south_bottom");
+				Identifier vertical_east_west_top_slab = new Identifier(namespace, "block/"+path + "_vertical_east_west_top");
+				Identifier vertical_east_west_bottom_slab = new Identifier(namespace, "block/"+path + "_vertical_east_west_bottom");
 				// Yes, I know these models are incredibly inefficient, but I need to parent them this way for the best mod compatibility.
 				JModel verticalSlabNorthSouthTopModel = JModel.model().parent(namespace+":block/"+path)
 						.element(JModel.element().from(0, 0, 0).to(16, 16, 8)
@@ -88,11 +78,10 @@ public class AutoSlabs implements ModInitializer {
 						.put("type=top,vertical_type=north_south", JState.model(vertical_north_south_top_slab))
 						.put("type=top,vertical_type=east_west", JState.model(vertical_east_west_top_slab))
 				), id);
-
 			}
 		}
 		StateRefresher.INSTANCE.reorderBlockStates();
-		RRPCallback.AFTER_VANILLA.register(a -> a.add(AUTO_SLABS_RESOURCES));
+		RRPCallback.BEFORE_USER.register(a -> a.add(AUTO_SLABS_RESOURCES));
 		//AUTO_SLABS_RESOURCES.dump();
 	}
 }
