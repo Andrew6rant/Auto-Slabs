@@ -233,25 +233,19 @@ public class RenderUtil {
         // I have no idea why, but this code only works when
         // in an if chain and not a switch statement
         if (part == HitPart.CENTER) {
-            //drawCenterLines(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, slabType, verticalType, side);
-            //System.out.println(vecCenterBottomRight + ", " + vecCenterMiddleRight + ", " + vecCenterTopRight + ", " + side);
+            drawCenterLines(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, slabType, verticalType, side);
         }
         else if (part == HitPart.BOTTOM) {
-            //drawTopBottomLines(camDif, vecBottomLeft, vecBottomRight, vecCenterBottomLeft, vecCenterBottomRight, vecCenterMiddleRight, slabType, verticalType, buffer, entry);
             drawTopBottomLines(entry, buffer, camDif, vecBottomLeft, vecBottomRight, vecCenterBottomLeft, vecCenterBottomRight, vecCenterMiddleBottom, slabType, verticalType, side);
-            //.out.println(vecCenterBottomLeft + ", " + vecCenterMiddleBottom + ", " + vecCenterBottomRight + ", " + side);
         }
         else if (part == HitPart.TOP) {
-            //drawTopBottomLines(camDif, vecTopLeft, vecTopRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, slabType, verticalType, buffer, entry);
             drawTopBottomLines(entry, buffer, camDif, vecTopLeft, vecTopRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleTop, slabType, verticalType, side);
         }
         else if (part == HitPart.LEFT) {
-            //drawLeftRightLines(entry, buffer, camDif, vecBottomLeft, vecTopLeft, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleLeft, slabType, verticalType, side);
             drawLeftRightLines(entry, buffer, camDif, vecBottomLeft, vecTopLeft, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleLeft, slabType, verticalType, side);
         }
         else if (part == HitPart.RIGHT) {
             drawLeftRightLines(entry, buffer, camDif, vecBottomRight, vecTopRight, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleRight, slabType, verticalType, side);
-            //System.out.println(vecCenterBottomRight + ", " + vecCenterMiddleRight + ", " + vecCenterTopRight + ", " + side);
         }
         tessellator.draw();
     }
@@ -289,22 +283,45 @@ public class RenderUtil {
     }
 
     private static void drawCenterLines(MatrixStack.Entry entry, BufferBuilder buffer, Vec3d camDif, Vector3f vecCenterBottomLeft, Vector3f vecCenterBottomRight, Vector3f vecCenterTopLeft, Vector3f vecCenterTopRight, Vector3f vecCenterMiddleLeft, Vector3f vecCenterMiddleRight, Vector3f vecCenterMiddleBottom, Vector3f vecCenterMiddleTop, SlabType slabType, VerticalType verticalType, Direction side) {
-        if (Objects.equals(slabType, SlabType.DOUBLE)) {
-            drawDefaultSquare(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight);
-        } else if (Objects.equals(verticalType, VerticalType.FALSE)) {
-            drawInternalSquare(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, slabType);
-        } else if (Objects.equals(verticalType, VerticalType.NORTH_SOUTH)) {
-            if (side == Direction.UP || side == Direction.DOWN) {
-                drawInternalSquare(entry, buffer, camDif, vecCenterTopLeft, vecCenterTopRight, vecCenterBottomLeft, vecCenterBottomRight, vecCenterMiddleLeft, vecCenterMiddleRight, slabType);
-            } else {
-                if (Objects.equals(slabType, SlabType.TOP)) {
-                    drawLine(entry, buffer, camDif, vecCenterTopLeft, vecCenterBottomLeft);
-                    drawLine(entry, buffer, camDif, vecCenterTopLeft, vecCenterMiddleTop);
-                    drawLine(entry, buffer, camDif, vecCenterBottomLeft, vecCenterMiddleBottom);
-                } else if (Objects.equals(slabType, SlabType.BOTTOM)) {
-
+        if (verticalType != null && slabType != null) {
+            switch (verticalType) {
+                case FALSE -> {
+                    switch (slabType) {
+                        case BOTTOM, TOP -> {
+                            if (side == Direction.DOWN || side == Direction.UP) {
+                                drawDefaultSquare(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight);
+                            } else {
+                                drawInternalSquare(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, slabType);
+                            }
+                        }
+                        case DOUBLE -> drawDefaultSquare(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight);
+                    }
                 }
-
+                case NORTH_SOUTH -> {
+                    switch (slabType) {
+                        case BOTTOM, TOP -> {
+                            switch (side) {
+                                case DOWN, UP -> drawInternalSquare(entry, buffer, camDif, vecCenterTopLeft, vecCenterTopRight, vecCenterBottomLeft, vecCenterBottomRight, vecCenterMiddleLeft, vecCenterMiddleRight, slabType);
+                                case NORTH, SOUTH -> drawDefaultSquare(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight);
+                                case EAST -> drawInternalSquare(entry, buffer, camDif, vecCenterBottomLeft, vecCenterTopLeft, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleBottom, vecCenterMiddleTop, slabType);
+                                case WEST -> drawInternalSquare(entry, buffer, camDif, vecCenterBottomRight, vecCenterTopRight, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleBottom, vecCenterMiddleTop, slabType);
+                            }
+                        }
+                        case DOUBLE -> drawDefaultSquare(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight);
+                    }
+                }
+                case EAST_WEST -> {
+                    switch (slabType) {
+                        case BOTTOM, TOP -> {
+                            switch (side) {
+                                case EAST, WEST -> drawDefaultSquare(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight);
+                                case SOUTH, DOWN -> drawInternalSquare(entry, buffer, camDif, vecCenterBottomLeft, vecCenterTopLeft, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleBottom, vecCenterMiddleTop, slabType);
+                                case NORTH, UP -> drawInternalSquare(entry, buffer, camDif, vecCenterBottomRight, vecCenterTopRight, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleBottom, vecCenterMiddleTop, slabType);
+                            }
+                        }
+                        case DOUBLE -> drawDefaultSquare(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight);
+                    }
+                }
             }
         }
     }
