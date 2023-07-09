@@ -279,6 +279,8 @@ public class RenderUtil {
                 }
                 case EAST_WEST -> drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
             }
+        } else {
+            drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
         }
     }
 
@@ -323,6 +325,8 @@ public class RenderUtil {
                     }
                 }
             }
+        } else {
+            drawDefaultSquare(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight);
         }
     }
 
@@ -355,6 +359,8 @@ public class RenderUtil {
                     }
                 }
             }
+        } else {
+            drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
         }
     }
 
