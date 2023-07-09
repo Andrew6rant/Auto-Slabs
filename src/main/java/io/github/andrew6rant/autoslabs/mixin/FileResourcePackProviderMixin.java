@@ -25,7 +25,7 @@ import java.util.function.UnaryOperator;
 public class FileResourcePackProviderMixin {
     @Shadow @Final private ResourceType type;
     private static final ResourcePackSource RUNTIME = ResourcePackSource.create(getSourceTextSupplier(), true);
-    private static final Logger ARRP_LOGGER = LogManager.getLogger("ARRP/FileResourcePackProviderMixin");
+    private static final Logger ARRP_LOGGER = LogManager.getLogger("AutoSlabs/FileResourcePackProviderMixin");
 
     private static UnaryOperator<Text> getSourceTextSupplier() {
         Text text = Text.translatable("pack.source.runtime");

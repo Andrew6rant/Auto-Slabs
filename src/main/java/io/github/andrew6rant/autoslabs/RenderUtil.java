@@ -1,6 +1,5 @@
 package io.github.andrew6rant.autoslabs;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -17,9 +16,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import java.util.Objects;
 import java.util.Optional;
 
 // massive thanks to Schauweg for much of this code
@@ -43,16 +42,23 @@ public class RenderUtil {
                 Vec3d camDif = getCameraOffset(camera.getPos(), result.getBlockPos(), result.getSide());
 
                 RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
-                RenderSystem.lineWidth(2);
-                RenderSystem.disableDepthTest();
+                // default Minecraft line width
+                RenderSystem.lineWidth(Math.max(2.5f, (float)MinecraftClient.getInstance().getWindow().getFramebufferWidth() / 1920.0f * 2.5f));
+                //RenderSystem.disableDepthTest();
                 RenderSystem.disableCull();
-                RenderSystem.enableBlend();
-                RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
+                //RenderSystem.enableBlend();
+                //RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
+                //RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
 
 
                 matrices.push();
+                BlockState state = MinecraftClient.getInstance().world.getBlockState(result.getBlockPos());
+                if (state.getBlock() instanceof SlabBlock) {
+                    renderOverlayToDirection(state, result.getSide(), matrices, camDif, part);
+                } else {
+                    renderOverlayToDirection(null, result.getSide(), matrices, camDif, part);
+                }
 
-                renderOverlayToDirection(result.getSide(), matrices, camDif, part);
 
                 matrices.pop();
                 RenderSystem.enableDepthTest();
@@ -67,7 +73,7 @@ public class RenderUtil {
         float r = 0;
         float g = 0;
         float b = 0;
-        float a = 0.5f;
+        float a = 0.2f;
 
         Vector3f startRaw = new Vector3f((float) (start.x + camDif.x), (float) (start.y + camDif.y), (float) (start.z + camDif.z));
         Vector3f endRaw = new Vector3f((float) (end.x + camDif.x), (float) (end.y + camDif.y), (float) (end.z + camDif.z));
@@ -90,162 +96,256 @@ public class RenderUtil {
         return new Vector3f(xLength, yLength, zLength);
     }
 
-    private static void renderOverlayToDirection(Direction side, MatrixStack matrixStack, Vec3d camDif, HitPart part) {
+    private static void renderOverlayToDirection(BlockState state, Direction side, MatrixStack matrixStack, Vec3d camDif, HitPart part) {
 
-        Vector3f vecBottomLeft = null, vecBottomRight = null, vecTopLeft = null, vecTopRight = null, vecCenterBottomLeft = null, vecCenterBottomRight = null, vecCenterTopLeft = null, vecCenterTopRight = null;
+        //ArrayList<Vector3f> points = new ArrayList<Vector3f>();
+        Vector3f vecBottomLeft = null, vecBottomRight = null, vecTopLeft = null, vecTopRight = null,
+                vecCenterBottomLeft = null, vecCenterBottomRight = null, vecCenterTopLeft = null, vecCenterTopRight = null,
+                vecCenterMiddleLeft = null, vecCenterMiddleRight = null, vecCenterMiddleBottom = null, vecCenterMiddleTop = null;
+
+        //System.out.println(side);
 
         //@formatter:off
         switch (side) {
             case DOWN -> {
-                vecBottomLeft        = new Vector3f(0,      0,      0);
-                vecBottomRight       = new Vector3f(1,      0,      0);
-                vecTopLeft           = new Vector3f(0,      0,      1);
-                vecTopRight          = new Vector3f(1,      0,      1);
-                vecCenterBottomLeft  = new Vector3f(0.25f,  0,      0.25f);
-                vecCenterBottomRight = new Vector3f(0.75f,  0,      0.25f);
-                vecCenterTopLeft     = new Vector3f(0.25f,  0,      0.75f);
-                vecCenterTopRight    = new Vector3f(0.75f,  0,      0.75f);
+                vecBottomLeft         = new Vector3f(0,      0,      0);
+                vecBottomRight        = new Vector3f(1,      0,      0);
+                vecTopLeft            = new Vector3f(0,      0,      1);
+                vecTopRight           = new Vector3f(1,      0,      1);
+                vecCenterBottomLeft   = new Vector3f(0.25f,  0,      0.25f);
+                vecCenterBottomRight  = new Vector3f(0.75f,  0,      0.25f);
+                vecCenterTopLeft      = new Vector3f(0.25f,  0,      0.75f);
+                vecCenterTopRight     = new Vector3f(0.75f,  0,      0.75f);
+                vecCenterMiddleLeft   = new Vector3f(0.25f,  0,      0.5f);
+                vecCenterMiddleRight  = new Vector3f(0.75f,  0,      0.5f);
+                vecCenterMiddleBottom = new Vector3f(0.5f,   0,      0.25f);
+                vecCenterMiddleTop    = new Vector3f(0.5f,   0,      0.75f);
             }
             case UP -> {
-                vecBottomLeft        = new Vector3f(1,      1,      0);
-                vecBottomRight       = new Vector3f(0,      1,      0);
-                vecTopLeft           = new Vector3f(1,      1,      1);
-                vecTopRight          = new Vector3f(0,      1,      1);
-                vecCenterBottomLeft  = new Vector3f(0.75f,  1,      0.25f);
-                vecCenterBottomRight = new Vector3f(0.25f,  1,      0.25f);
-                vecCenterTopLeft     = new Vector3f(0.75f,  1,      0.75f);
-                vecCenterTopRight    = new Vector3f(0.25f,  1,      0.75f);
+                vecBottomLeft         = new Vector3f(1,      1,      0);
+                vecBottomRight        = new Vector3f(0,      1,      0);
+                vecTopLeft            = new Vector3f(1,      1,      1);
+                vecTopRight           = new Vector3f(0,      1,      1);
+                vecCenterBottomLeft   = new Vector3f(0.75f,  1,      0.25f);
+                vecCenterBottomRight  = new Vector3f(0.25f,  1,      0.25f);
+                vecCenterTopLeft      = new Vector3f(0.75f,  1,      0.75f);
+                vecCenterTopRight     = new Vector3f(0.25f,  1,      0.75f);
+                vecCenterMiddleLeft   = new Vector3f(0.75f,  1,      0.5f);
+                vecCenterMiddleRight  = new Vector3f(0.25f,  1,      0.5f);
+                vecCenterMiddleBottom = new Vector3f(0.5f,   1,      0.25f);
+                vecCenterMiddleTop    = new Vector3f(0.5f,   1,      0.75f);
             }
             case NORTH -> {
-                vecBottomLeft        = new Vector3f(1,      0,      0);
-                vecBottomRight       = new Vector3f(0,      0,      0);
-                vecTopLeft           = new Vector3f(1,      1,      0);
-                vecTopRight          = new Vector3f(0,      1,      0);
-                vecCenterBottomLeft  = new Vector3f(0.75f,  0.25f,  0);
-                vecCenterBottomRight = new Vector3f(0.25f,  0.25f,  0);
-                vecCenterTopLeft     = new Vector3f(0.75f,  0.75f,  0);
-                vecCenterTopRight    = new Vector3f(0.25f,  0.75f,  0);
+                vecBottomLeft         = new Vector3f(1,      0,      0);
+                vecBottomRight        = new Vector3f(0,      0,      0);
+                vecTopLeft            = new Vector3f(1,      1,      0);
+                vecTopRight           = new Vector3f(0,      1,      0);
+                vecCenterBottomLeft   = new Vector3f(0.75f,  0.25f,  0);
+                vecCenterBottomRight  = new Vector3f(0.25f,  0.25f,  0);
+                vecCenterTopLeft      = new Vector3f(0.75f,  0.75f,  0);
+                vecCenterTopRight     = new Vector3f(0.25f,  0.75f,  0);
+                vecCenterMiddleLeft   = new Vector3f(0.75f,  0.5f,   0);
+                vecCenterMiddleRight  = new Vector3f(0.25f,  0.5f,   0);
+
+                vecCenterMiddleBottom = new Vector3f(0.5f,   0.25f,      0);
+                vecCenterMiddleTop    = new Vector3f(0.5f,   .75f,      0);
             }
             case SOUTH -> {
-                vecBottomLeft        = new Vector3f(0,      0,      1);
-                vecBottomRight       = new Vector3f(1,      0,      1);
-                vecTopLeft           = new Vector3f(0,      1,      1);
-                vecTopRight          = new Vector3f(1,      1,      1);
-                vecCenterBottomLeft  = new Vector3f(0.25f,  0.25f,  1);
-                vecCenterBottomRight = new Vector3f(0.75f,  0.25f,  1);
-                vecCenterTopLeft     = new Vector3f(0.25f,  0.75f,  1);
-                vecCenterTopRight    = new Vector3f(0.75f,  0.75f,  1);
+                vecBottomLeft         = new Vector3f(0,      0,      1);
+                vecBottomRight        = new Vector3f(1,      0,      1);
+                vecTopLeft            = new Vector3f(0,      1,      1);
+                vecTopRight           = new Vector3f(1,      1,      1);
+                vecCenterBottomLeft   = new Vector3f(0.25f,  0.25f,  1);
+                vecCenterBottomRight  = new Vector3f(0.75f,  0.25f,  1);
+                vecCenterTopLeft      = new Vector3f(0.25f,  0.75f,  1);
+                vecCenterTopRight     = new Vector3f(0.75f,  0.75f,  1);
+                vecCenterMiddleLeft   = new Vector3f(0.25f,  0.5f,   1);
+                vecCenterMiddleRight  = new Vector3f(0.75f,  0.5f,   1);
+
+                vecCenterMiddleBottom = new Vector3f(0.5f,   0.25f,      1);
+                vecCenterMiddleTop    = new Vector3f(0.5f,   0.75f,      1);
             }
             case WEST -> {
-                vecBottomLeft        = new Vector3f(0,      0,      0);
-                vecBottomRight       = new Vector3f(0,      0,      1);
-                vecTopLeft           = new Vector3f(0,      1,      0);
-                vecTopRight          = new Vector3f(0,      1,      1);
-                vecCenterBottomLeft  = new Vector3f(0,      0.25f,  0.25f);
-                vecCenterBottomRight = new Vector3f(0,      0.25f,  0.75f);
-                vecCenterTopLeft     = new Vector3f(0,      0.75f,  0.25f);
-                vecCenterTopRight    = new Vector3f(0,      0.75f,  0.75f);
+                vecBottomLeft         = new Vector3f(0,      0,      0);
+                vecBottomRight        = new Vector3f(0,      0,      1);
+                vecTopLeft            = new Vector3f(0,      1,      0);
+                vecTopRight           = new Vector3f(0,      1,      1);
+                vecCenterBottomLeft   = new Vector3f(0,      0.25f,  0.25f);
+                vecCenterBottomRight  = new Vector3f(0,      0.25f,  0.75f);
+                vecCenterTopLeft      = new Vector3f(0,      0.75f,  0.25f);
+                vecCenterTopRight     = new Vector3f(0,      0.75f,  0.75f);
+                vecCenterMiddleLeft   = new Vector3f(0,      0.5f,   0.25f);
+                vecCenterMiddleRight  = new Vector3f(0,      0.5f,   0.75f);
+
+                vecCenterMiddleBottom = new Vector3f(0f,     0.25f,  0.5f);
+                vecCenterMiddleTop    = new Vector3f(0f,     0.75f,  0.5f);
             }
             case EAST -> {
-                vecBottomLeft        = new Vector3f(1,      0,      1);
-                vecBottomRight       = new Vector3f(1,      0,      0);
-                vecTopLeft           = new Vector3f(1,      1,      1);
-                vecTopRight          = new Vector3f(1,      1,      0);
-                vecCenterBottomLeft  = new Vector3f(1,      0.25f,  0.75f);
-                vecCenterBottomRight = new Vector3f(1,      0.25f,  0.25f);
-                vecCenterTopLeft     = new Vector3f(1,      0.75f,  0.75f);
-                vecCenterTopRight    = new Vector3f(1,      0.75f,  0.25f);
+                vecBottomLeft         = new Vector3f(1,      0,      1);
+                vecBottomRight        = new Vector3f(1,      0,      0);
+                vecTopLeft            = new Vector3f(1,      1,      1);
+                vecTopRight           = new Vector3f(1,      1,      0);
+                vecCenterBottomLeft   = new Vector3f(1,      0.25f,  0.75f);
+                vecCenterBottomRight  = new Vector3f(1,      0.25f,  0.25f);
+                vecCenterTopLeft      = new Vector3f(1,      0.75f,  0.75f);
+                vecCenterTopRight     = new Vector3f(1,      0.75f,  0.25f);
+                vecCenterMiddleLeft   = new Vector3f(1,      0.5f,   0.75f);
+                vecCenterMiddleRight  = new Vector3f(1,      0.5f,   0.25f);
+
+                vecCenterMiddleBottom = new Vector3f(1,      0.25f,  0.5f);
+                vecCenterMiddleTop    = new Vector3f(1,      0.75f,  0.5f);
             }
         }
         //@formatter:on
 
-        //System.out.println(side);
+        SlabType slabType = null;
+        VerticalType verticalType = null;
+        if (state != null) {
+            slabType = state.get(SlabBlock.TYPE);
+            verticalType = state.get(VERTICAL_TYPE);
+        }
+        
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
+        MatrixStack.Entry entry = matrixStack.peek();
+
         // I have no idea why, but this code only works when
         // in an if chain and not a switch statement
         if (part == HitPart.CENTER) {
-
-            drawQuad(vecBottomLeft, vecBottomRight, vecCenterBottomRight, vecCenterBottomLeft, camDif, matrixStack);
-            drawQuad(vecTopLeft, vecTopRight, vecCenterTopRight, vecCenterTopLeft, camDif, matrixStack);
-            drawQuad(vecBottomLeft, vecTopLeft, vecCenterTopLeft, vecCenterBottomLeft, camDif, matrixStack);
-            drawQuad(vecBottomRight, vecTopRight, vecCenterTopRight, vecCenterBottomRight, camDif, matrixStack);
-
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
-            buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
-            MatrixStack.Entry entry = matrixStack.peek();
-            RenderSystem.lineWidth(3.5f);
-            drawLine(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight);
-            drawLine(entry, buffer, camDif, vecCenterBottomLeft, vecCenterTopLeft);
-            drawLine(entry, buffer, camDif, vecCenterBottomRight, vecCenterTopRight);
-            drawLine(entry, buffer, camDif, vecCenterTopLeft, vecCenterTopRight);
-            tessellator.draw();
+            drawCenterLines(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, slabType, verticalType, side);
+            //System.out.println(vecCenterBottomRight + ", " + vecCenterMiddleRight + ", " + vecCenterTopRight + ", " + side);
         }
         else if (part == HitPart.BOTTOM) {
-            drawQuad(vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopRight, vecCenterTopLeft, camDif, matrixStack);
-            drawQuad(vecTopLeft, vecTopRight, vecCenterTopRight, vecCenterTopLeft, camDif, matrixStack);
-            drawQuad(vecBottomLeft, vecTopLeft, vecCenterTopLeft, vecCenterBottomLeft, camDif, matrixStack);
-            drawQuad(vecBottomRight, vecTopRight, vecCenterTopRight, vecCenterBottomRight, camDif, matrixStack);
-
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
-            buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
-            MatrixStack.Entry entry = matrixStack.peek();
-            RenderSystem.lineWidth(3.5f);
-            drawLine(entry, buffer, camDif, vecBottomLeft, vecCenterBottomLeft);
-            drawLine(entry, buffer, camDif, vecBottomRight, vecCenterBottomRight);
-            drawLine(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight);
-            tessellator.draw();
+            //drawTopBottomLines(camDif, vecBottomLeft, vecBottomRight, vecCenterBottomLeft, vecCenterBottomRight, vecCenterMiddleRight, slabType, verticalType, buffer, entry);
+            drawTopBottomLines(entry, buffer, camDif, vecBottomLeft, vecBottomRight, vecCenterBottomLeft, vecCenterBottomRight, vecCenterMiddleBottom, slabType, verticalType, side);
+            //.out.println(vecCenterBottomLeft + ", " + vecCenterMiddleBottom + ", " + vecCenterBottomRight + ", " + side);
         }
         else if (part == HitPart.TOP) {
-            drawQuad(vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopRight, vecCenterTopLeft, camDif, matrixStack);
-            drawQuad(vecBottomLeft, vecBottomRight, vecCenterBottomRight, vecCenterBottomLeft, camDif, matrixStack);
-            drawQuad(vecBottomLeft, vecTopLeft, vecCenterTopLeft, vecCenterBottomLeft, camDif, matrixStack);
-            drawQuad(vecBottomRight, vecTopRight, vecCenterTopRight, vecCenterBottomRight, camDif, matrixStack);
-
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
-            buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
-            MatrixStack.Entry entry = matrixStack.peek();
-            RenderSystem.lineWidth(3.5f);
-            drawLine(entry, buffer, camDif, vecTopLeft, vecCenterTopLeft);
-            drawLine(entry, buffer, camDif, vecTopRight, vecCenterTopRight);
-            drawLine(entry, buffer, camDif, vecCenterTopLeft, vecCenterTopRight);
-            tessellator.draw();
+            //drawTopBottomLines(camDif, vecTopLeft, vecTopRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, slabType, verticalType, buffer, entry);
+            drawTopBottomLines(entry, buffer, camDif, vecTopLeft, vecTopRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleTop, slabType, verticalType, side);
         }
         else if (part == HitPart.LEFT) {
-            drawQuad(vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopRight, vecCenterTopLeft, camDif, matrixStack);
-            drawQuad(vecBottomLeft, vecBottomRight, vecCenterBottomRight, vecCenterBottomLeft, camDif, matrixStack);
-            drawQuad(vecTopLeft, vecTopRight, vecCenterTopRight, vecCenterTopLeft, camDif, matrixStack);
-            drawQuad(vecBottomRight, vecTopRight, vecCenterTopRight, vecCenterBottomRight, camDif, matrixStack);
-
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
-            buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
-            MatrixStack.Entry entry = matrixStack.peek();
-            RenderSystem.lineWidth(3.5f);
-            drawLine(entry, buffer, camDif, vecBottomLeft, vecCenterBottomLeft);
-            drawLine(entry, buffer, camDif, vecTopLeft, vecCenterTopLeft);
-            drawLine(entry, buffer, camDif, vecCenterBottomLeft, vecCenterTopLeft);
-            tessellator.draw();
+            drawLeftRightLines(entry, buffer, camDif, vecBottomLeft, vecTopLeft, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleLeft, slabType, verticalType, side);
         }
         else if (part == HitPart.RIGHT) {
-            drawQuad(vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopRight, vecCenterTopLeft, camDif, matrixStack);
-            drawQuad(vecBottomLeft, vecBottomRight, vecCenterBottomRight, vecCenterBottomLeft, camDif, matrixStack);
-            drawQuad(vecTopLeft, vecTopRight, vecCenterTopRight, vecCenterTopLeft, camDif, matrixStack);
-            drawQuad(vecBottomLeft, vecTopLeft, vecCenterTopLeft, vecCenterBottomLeft, camDif, matrixStack);
+            drawLeftRightLines(entry, buffer, camDif, vecBottomRight, vecTopRight, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleRight, slabType, verticalType, side);
+            //System.out.println(vecCenterBottomRight + ", " + vecCenterMiddleRight + ", " + vecCenterTopRight + ", " + side);
+        }
+        tessellator.draw();
+    }
 
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
-            buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
-            MatrixStack.Entry entry = matrixStack.peek();
-            RenderSystem.lineWidth(3.5f);
-            drawLine(entry, buffer, camDif, vecBottomRight, vecCenterBottomRight);
-            drawLine(entry, buffer, camDif, vecTopRight, vecCenterTopRight);
-            drawLine(entry, buffer, camDif, vecCenterBottomRight, vecCenterTopRight);
-            tessellator.draw();
+    private static void drawCenterLines(MatrixStack.Entry entry, BufferBuilder buffer, Vec3d camDif, Vector3f vecCenterBottomLeft, Vector3f vecCenterBottomRight, Vector3f vecCenterTopLeft, Vector3f vecCenterTopRight, Vector3f vecCenterMiddleLeft, Vector3f vecCenterMiddleRight, Vector3f vecCenterMiddleBottom, Vector3f vecCenterMiddleTop, SlabType slabType, VerticalType verticalType, Direction side) {
+        if (Objects.equals(slabType, SlabType.DOUBLE)) {
+            drawDefaultSquare(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight);
+        } else if (Objects.equals(verticalType, VerticalType.FALSE)) {
+            drawInternalSquare(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, slabType);
+        } else if (Objects.equals(verticalType, VerticalType.NORTH_SOUTH)) {
+            if (side == Direction.UP || side == Direction.DOWN) {
+                drawInternalSquare(entry, buffer, camDif, vecCenterTopLeft, vecCenterTopRight, vecCenterBottomLeft, vecCenterBottomRight, vecCenterMiddleLeft, vecCenterMiddleRight, slabType);
+            } else {
+                if (Objects.equals(slabType, SlabType.TOP)) {
+                    drawLine(entry, buffer, camDif, vecCenterTopLeft, vecCenterBottomLeft);
+                    drawLine(entry, buffer, camDif, vecCenterTopLeft, vecCenterMiddleTop);
+                    drawLine(entry, buffer, camDif, vecCenterBottomLeft, vecCenterMiddleBottom);
+                } else if (Objects.equals(slabType, SlabType.BOTTOM)) {
+
+                }
+
+            }
         }
 
+    }
 
+    private static void drawTopBottomLines(MatrixStack.Entry entry, BufferBuilder buffer, Vec3d camDif, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vector3f vecCenterMiddleCorner, SlabType slabType, VerticalType verticalType, Direction side) {
+        if (Objects.equals(slabType, SlabType.DOUBLE)) {
+            drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+        } else if (Objects.equals(verticalType, VerticalType.NORTH_SOUTH)) {
+            if (side == Direction.EAST) {
+                drawInternalVertical(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, vecCenterMiddleCorner, slabType);
+            } else if (side == Direction.WEST) {
+                drawInternalVertical(entry, buffer, camDif, vecEndCorner, vecStartCorner, vecCenterEndCorner, vecCenterStartCorner, vecCenterMiddleCorner, slabType);
+            } else {
+                drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+            }
+        } else if (Objects.equals(verticalType, VerticalType.EAST_WEST)) {
+            if (side == Direction.NORTH || side == Direction.UP) {
+                drawInternalVertical(entry, buffer, camDif, vecEndCorner, vecStartCorner, vecCenterEndCorner, vecCenterStartCorner, vecCenterMiddleCorner, slabType);
+            } else if (side == Direction.SOUTH || side == Direction.DOWN) {
+                drawInternalVertical(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, vecCenterMiddleCorner, slabType);
+            } else {
+                drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+            }
+        } else {
+            drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+        }
+    }
+
+    private static void drawLeftRightLines(MatrixStack.Entry entry, BufferBuilder buffer, Vec3d camDif, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vector3f vecCenterMiddleCorner, SlabType slabType, VerticalType verticalType, Direction side) {
+        if (Objects.equals(slabType, SlabType.DOUBLE)) {
+            drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+        } else if (Objects.equals(verticalType, VerticalType.FALSE)) {
+            if (side != Direction.DOWN && side != Direction.UP) {
+                drawInternal(entry, buffer, camDif, vecEndCorner, vecStartCorner, vecCenterEndCorner, vecCenterStartCorner, vecCenterMiddleCorner, slabType);
+            } else {
+                drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+            }
+        } else if (Objects.equals(verticalType, VerticalType.NORTH_SOUTH)) {
+            if (side == Direction.DOWN || side == Direction.UP) {
+                drawInternal(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, vecCenterMiddleCorner, slabType);
+            } else {
+                drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+            }
+        } else if (Objects.equals(verticalType, VerticalType.EAST_WEST)) {
+            drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+        } else {
+            drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+        }
+    }
+
+    private static void drawInternalSquare(MatrixStack.Entry entry, BufferBuilder buffer, Vec3d camDif, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vector3f vecCenterMiddleStart, Vector3f vecCenterMiddleEnd, SlabType slabType) {
+        if (Objects.equals(slabType, SlabType.TOP)) {
+            drawLine(entry, buffer, camDif, vecCenterMiddleStart, vecCenterStartCorner);
+            drawLine(entry, buffer, camDif, vecCenterStartCorner, vecCenterEndCorner);
+            drawLine(entry, buffer, camDif, vecCenterEndCorner, vecCenterMiddleEnd);
+        } else if (Objects.equals(slabType, SlabType.BOTTOM)) {
+            drawLine(entry, buffer, camDif, vecStartCorner, vecCenterMiddleStart);
+            drawLine(entry, buffer, camDif, vecStartCorner, vecEndCorner);
+            drawLine(entry, buffer, camDif, vecEndCorner, vecCenterMiddleEnd);
+        }
+    }
+
+    private static void drawInternalVertical(MatrixStack.Entry entry, BufferBuilder buffer, Vec3d camDif, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vector3f vecCenterMiddleCorner, SlabType slabType) {
+        if (Objects.equals(slabType, SlabType.TOP)) {
+            drawLine(entry, buffer, camDif, vecEndCorner, vecCenterEndCorner);
+            drawLine(entry, buffer, camDif, vecCenterEndCorner, vecCenterMiddleCorner);
+        } else if (Objects.equals(slabType, SlabType.BOTTOM)) {
+            drawLine(entry, buffer, camDif, vecStartCorner, vecCenterStartCorner);
+            drawLine(entry, buffer, camDif, vecCenterStartCorner, vecCenterMiddleCorner);
+        }
+    }
+
+    private static void drawInternal(MatrixStack.Entry entry, BufferBuilder buffer, Vec3d camDif, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vector3f vecCenterMiddleCorner, SlabType slabType) {
+        if (Objects.equals(slabType, SlabType.BOTTOM)) {
+            drawLine(entry, buffer, camDif, vecEndCorner, vecCenterEndCorner);
+            drawLine(entry, buffer, camDif, vecCenterEndCorner, vecCenterMiddleCorner);
+        } else if (Objects.equals(slabType, SlabType.TOP)) {
+            drawLine(entry, buffer, camDif, vecStartCorner, vecCenterStartCorner);
+            drawLine(entry, buffer, camDif, vecCenterStartCorner, vecCenterMiddleCorner);
+        }
+    }
+
+    private static void drawDefaultLines(MatrixStack.Entry entry, BufferBuilder buffer, Vec3d camDif, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner) {
+        drawLine(entry, buffer, camDif, vecStartCorner, vecCenterStartCorner);
+        drawLine(entry, buffer, camDif, vecEndCorner, vecCenterEndCorner);
+        drawLine(entry, buffer, camDif, vecCenterStartCorner, vecCenterEndCorner);
+    }
+
+    private static void drawDefaultSquare(MatrixStack.Entry entry, BufferBuilder buffer, Vec3d camDif, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner) {
+        drawLine(entry, buffer, camDif, vecStartCorner, vecEndCorner);
+        drawLine(entry, buffer, camDif, vecStartCorner, vecCenterStartCorner);
+        drawLine(entry, buffer, camDif, vecEndCorner, vecCenterEndCorner);
+        drawLine(entry, buffer, camDif, vecCenterStartCorner, vecCenterEndCorner);
     }
 
     public static HitPart getHitPart(BlockHitResult hit) {
@@ -301,34 +401,36 @@ public class RenderUtil {
         double yDif = (double) pos.getY() - camera.y;
         double zDif = (double) pos.getZ() - camera.z;
         if (state.getBlock() instanceof SlabBlock) {
+            SlabType slabType = state.get(SlabBlock.TYPE);
+            VerticalType verticalType = state.get(VERTICAL_TYPE);
             switch (side) {
                 case UP -> {
-                    if ((state.get(SlabBlock.TYPE) == SlabType.BOTTOM) && (state.get(VERTICAL_TYPE) == VerticalType.FALSE)) {
+                    if ((slabType == SlabType.BOTTOM) && (verticalType == VerticalType.FALSE)) {
                         yDif -= 0.5d;
                     }
                 }
                 case DOWN -> {
-                    if ((state.get(SlabBlock.TYPE) == SlabType.TOP) && (state.get(VERTICAL_TYPE) == VerticalType.FALSE)) {
+                    if ((slabType == SlabType.TOP) && (verticalType == VerticalType.FALSE)) {
                         yDif += 0.5d;
                     }
                 }
                 case NORTH -> {
-                    if ((state.get(VERTICAL_TYPE) == VerticalType.NORTH_SOUTH) && (state.get(SlabBlock.TYPE) == SlabType.BOTTOM)) {
+                    if ((verticalType == VerticalType.NORTH_SOUTH) && (slabType == SlabType.BOTTOM)) {
                         zDif += 0.5d;
                     }
                 }
                 case SOUTH -> {
-                    if ((state.get(VERTICAL_TYPE) == VerticalType.NORTH_SOUTH) && (state.get(SlabBlock.TYPE) == SlabType.TOP)) {
+                    if ((verticalType == VerticalType.NORTH_SOUTH) && (slabType == SlabType.TOP)) {
                         zDif -= 0.5d;
                     }
                 }
                 case WEST -> {
-                    if ((state.get(VERTICAL_TYPE) == VerticalType.EAST_WEST) && (state.get(SlabBlock.TYPE) == SlabType.TOP)) {
+                    if ((verticalType == VerticalType.EAST_WEST) && (slabType == SlabType.TOP)) {
                         xDif += 0.5d;
                     }
                 }
                 case EAST -> {
-                    if ((state.get(VERTICAL_TYPE) == VerticalType.EAST_WEST) && (state.get(SlabBlock.TYPE) == SlabType.BOTTOM)) {
+                    if ((verticalType == VerticalType.EAST_WEST) && (slabType == SlabType.BOTTOM)) {
                         xDif -= 0.5d;
                     }
                 }
@@ -339,6 +441,7 @@ public class RenderUtil {
 
 
     public static void drawQuad(Vector3f pos1, Vector3f pos2, Vector3f pos3, Vector3f pos4, Vec3d camDif, MatrixStack matrixStack) {
+/*
         Vector3f pos1Raw = new Vector3f((float) (pos1.x + camDif.x), (float) (pos1.y + camDif.y), (float) (pos1.z + camDif.z));
         Vector3f pos2Raw = new Vector3f((float) (pos2.x + camDif.x), (float) (pos2.y + camDif.y), (float) (pos2.z + camDif.z));
         Vector3f pos3Raw = new Vector3f((float) (pos3.x + camDif.x), (float) (pos3.y + camDif.y), (float) (pos3.z + camDif.z));
@@ -357,6 +460,7 @@ public class RenderUtil {
         buffer.vertex(position, pos4Raw.x, pos4Raw.y, pos4Raw.z).color(0f, 0f, 0f, 0.15f).next();
 
         tessellator.draw();
+        */
     }
 
     public enum HitPart {

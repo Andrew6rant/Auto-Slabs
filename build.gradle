@@ -21,7 +21,7 @@ repositories {
         url = "https://jitpack.io"
     }
     maven {
-        url = uri("https://storage.googleapis.com/devan-maven/")
+		url = uri("https://ueaj.dev/maven")
     }
 }
 
