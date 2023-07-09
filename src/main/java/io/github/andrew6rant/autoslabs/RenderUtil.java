@@ -85,6 +85,26 @@ public class RenderUtil {
                 .color(r, g, b, a).normal(entry.getNormalMatrix(), normal.x, normal.y, normal.z).next();
     }
 
+    private static void drawCulledLine(MatrixStack.Entry entry, BufferBuilder buffer, Vec3d camDif, Vector3f start, Vector3f end) {
+        Vector3f normal = getNormalAngle(start, end);
+        float r = 0;
+        float g = 0;
+        float b = 0;
+        float a = 0.2f;
+
+        Vector3f startRaw = new Vector3f((float) (start.x + camDif.x), (float) (start.y + camDif.y), (float) (start.z + camDif.z));
+        Vector3f endRaw = new Vector3f((float) (end.x + camDif.x), (float) (end.y + camDif.y), (float) (end.z + camDif.z));
+
+        buffer.vertex(entry.getPositionMatrix(), startRaw.x, startRaw.y, startRaw.z)
+                .color(r, g, b, a).normal(entry.getNormalMatrix(), normal.x, normal.y, normal.z).next();
+
+        //System.out.println("x: " + endRaw.x + " y: " + endRaw.y+ " z: " + endRaw.z);
+        //.vertex(entry.getPositionMatrix(), Math.min(endRaw.x, 0.5f), Math.min(endRaw.y, 0.5f), Math.min(endRaw.z, 0.5f))
+        //        .color(r, g, b, a).normal(entry.getNormalMatrix(), normal.x, normal.y, normal.z).next();
+        buffer.vertex(entry.getPositionMatrix(), endRaw.x, endRaw.y, endRaw.z)
+                .color(r, g, b, a).normal(entry.getNormalMatrix(), normal.x, normal.y, normal.z).next();
+    }
+
     public static Vector3f getNormalAngle(Vector3f start, Vector3f end) {
         float xLength = end.x - start.x;
         float yLength = end.y - start.y;
@@ -213,7 +233,7 @@ public class RenderUtil {
         // I have no idea why, but this code only works when
         // in an if chain and not a switch statement
         if (part == HitPart.CENTER) {
-            drawCenterLines(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, slabType, verticalType, side);
+            //drawCenterLines(entry, buffer, camDif, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, slabType, verticalType, side);
             //System.out.println(vecCenterBottomRight + ", " + vecCenterMiddleRight + ", " + vecCenterTopRight + ", " + side);
         }
         else if (part == HitPart.BOTTOM) {
@@ -226,6 +246,7 @@ public class RenderUtil {
             drawTopBottomLines(entry, buffer, camDif, vecTopLeft, vecTopRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleTop, slabType, verticalType, side);
         }
         else if (part == HitPart.LEFT) {
+            //drawLeftRightLines(entry, buffer, camDif, vecBottomLeft, vecTopLeft, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleLeft, slabType, verticalType, side);
             drawLeftRightLines(entry, buffer, camDif, vecBottomLeft, vecTopLeft, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleLeft, slabType, verticalType, side);
         }
         else if (part == HitPart.RIGHT) {
@@ -233,6 +254,38 @@ public class RenderUtil {
             //System.out.println(vecCenterBottomRight + ", " + vecCenterMiddleRight + ", " + vecCenterTopRight + ", " + side);
         }
         tessellator.draw();
+    }
+
+    private static void drawLeftRightLines(MatrixStack.Entry entry, BufferBuilder buffer, Vec3d camDif, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vector3f vecCenterMiddleCorner, SlabType slabType, VerticalType verticalType, Direction side) {
+        if (verticalType != null && slabType != null) {
+            switch (verticalType) {
+                case FALSE -> {
+                    switch (slabType) {
+                        case BOTTOM, TOP -> {
+                            if (side == Direction.DOWN || side == Direction.UP) {
+                                drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+                            } else {
+                                drawInternal(entry, buffer, camDif, vecEndCorner, vecStartCorner, vecCenterEndCorner, vecCenterStartCorner, vecCenterMiddleCorner, slabType);
+                            }
+                        }
+                        case DOUBLE -> drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+                    }
+                }
+                case NORTH_SOUTH -> {
+                    switch (slabType) {
+                        case BOTTOM, TOP -> {
+                            if (side == Direction.DOWN || side == Direction.UP) {
+                                drawInternal(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, vecCenterMiddleCorner, slabType);
+                            } else {
+                                drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+                            }
+                        }
+                        case DOUBLE -> drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+                    }
+                }
+                case EAST_WEST -> drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+            }
+        }
     }
 
     private static void drawCenterLines(MatrixStack.Entry entry, BufferBuilder buffer, Vec3d camDif, Vector3f vecCenterBottomLeft, Vector3f vecCenterBottomRight, Vector3f vecCenterTopLeft, Vector3f vecCenterTopRight, Vector3f vecCenterMiddleLeft, Vector3f vecCenterMiddleRight, Vector3f vecCenterMiddleBottom, Vector3f vecCenterMiddleTop, SlabType slabType, VerticalType verticalType, Direction side) {
@@ -254,52 +307,37 @@ public class RenderUtil {
 
             }
         }
-
     }
 
     private static void drawTopBottomLines(MatrixStack.Entry entry, BufferBuilder buffer, Vec3d camDif, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vector3f vecCenterMiddleCorner, SlabType slabType, VerticalType verticalType, Direction side) {
-        if (Objects.equals(slabType, SlabType.DOUBLE)) {
-            drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
-        } else if (Objects.equals(verticalType, VerticalType.NORTH_SOUTH)) {
-            if (side == Direction.EAST) {
-                drawInternalVertical(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, vecCenterMiddleCorner, slabType);
-            } else if (side == Direction.WEST) {
-                drawInternalVertical(entry, buffer, camDif, vecEndCorner, vecStartCorner, vecCenterEndCorner, vecCenterStartCorner, vecCenterMiddleCorner, slabType);
-            } else {
-                drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+        if (verticalType != null && slabType != null) {
+            switch (verticalType) {
+                case FALSE -> drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+                case NORTH_SOUTH -> {
+                    switch (slabType) {
+                        case BOTTOM, TOP -> {
+                            switch (side) {
+                                case DOWN, UP, NORTH, SOUTH -> drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+                                case EAST -> drawInternal(entry, buffer, camDif, vecEndCorner, vecStartCorner, vecCenterEndCorner, vecCenterStartCorner, vecCenterMiddleCorner, slabType);
+                                case WEST -> drawInternal(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, vecCenterMiddleCorner, slabType);
+                            }
+                        }
+                        case DOUBLE -> drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+                    }
+                }
+                case EAST_WEST -> {
+                    switch (slabType) {
+                        case BOTTOM, TOP -> {
+                            switch (side) {
+                                case EAST, WEST -> drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+                                case NORTH, UP -> drawInternal(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, vecCenterMiddleCorner, slabType);
+                                case SOUTH, DOWN -> drawInternal(entry, buffer, camDif, vecEndCorner, vecStartCorner, vecCenterEndCorner, vecCenterStartCorner, vecCenterMiddleCorner, slabType);
+                            }
+                        }
+                        case DOUBLE -> drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
+                    }
+                }
             }
-        } else if (Objects.equals(verticalType, VerticalType.EAST_WEST)) {
-            if (side == Direction.NORTH || side == Direction.UP) {
-                drawInternalVertical(entry, buffer, camDif, vecEndCorner, vecStartCorner, vecCenterEndCorner, vecCenterStartCorner, vecCenterMiddleCorner, slabType);
-            } else if (side == Direction.SOUTH || side == Direction.DOWN) {
-                drawInternalVertical(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, vecCenterMiddleCorner, slabType);
-            } else {
-                drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
-            }
-        } else {
-            drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
-        }
-    }
-
-    private static void drawLeftRightLines(MatrixStack.Entry entry, BufferBuilder buffer, Vec3d camDif, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vector3f vecCenterMiddleCorner, SlabType slabType, VerticalType verticalType, Direction side) {
-        if (Objects.equals(slabType, SlabType.DOUBLE)) {
-            drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
-        } else if (Objects.equals(verticalType, VerticalType.FALSE)) {
-            if (side != Direction.DOWN && side != Direction.UP) {
-                drawInternal(entry, buffer, camDif, vecEndCorner, vecStartCorner, vecCenterEndCorner, vecCenterStartCorner, vecCenterMiddleCorner, slabType);
-            } else {
-                drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
-            }
-        } else if (Objects.equals(verticalType, VerticalType.NORTH_SOUTH)) {
-            if (side == Direction.DOWN || side == Direction.UP) {
-                drawInternal(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, vecCenterMiddleCorner, slabType);
-            } else {
-                drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
-            }
-        } else if (Objects.equals(verticalType, VerticalType.EAST_WEST)) {
-            drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
-        } else {
-            drawDefaultLines(entry, buffer, camDif, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner);
         }
     }
 
@@ -312,16 +350,6 @@ public class RenderUtil {
             drawLine(entry, buffer, camDif, vecStartCorner, vecCenterMiddleStart);
             drawLine(entry, buffer, camDif, vecStartCorner, vecEndCorner);
             drawLine(entry, buffer, camDif, vecEndCorner, vecCenterMiddleEnd);
-        }
-    }
-
-    private static void drawInternalVertical(MatrixStack.Entry entry, BufferBuilder buffer, Vec3d camDif, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vector3f vecCenterMiddleCorner, SlabType slabType) {
-        if (Objects.equals(slabType, SlabType.TOP)) {
-            drawLine(entry, buffer, camDif, vecEndCorner, vecCenterEndCorner);
-            drawLine(entry, buffer, camDif, vecCenterEndCorner, vecCenterMiddleCorner);
-        } else if (Objects.equals(slabType, SlabType.BOTTOM)) {
-            drawLine(entry, buffer, camDif, vecStartCorner, vecCenterStartCorner);
-            drawLine(entry, buffer, camDif, vecCenterStartCorner, vecCenterMiddleCorner);
         }
     }
 
