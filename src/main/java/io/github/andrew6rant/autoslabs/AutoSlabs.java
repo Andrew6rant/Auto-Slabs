@@ -21,12 +21,6 @@ public class AutoSlabs implements ModInitializer {
 	@Override
 	public void onInitialize() {
 
-		//Configurator.setLevel(StatementApi.MOD_ID, Level.FATAL);
-
-
-		//Logger.getLogger(StatementApi.MOD_ID).setLevel(Level.OFF);
-		//LoggerContext.
-
 		for (Block block : Registries.BLOCK) {
 			if (block instanceof SlabBlock) {
 				StateRefresher.INSTANCE.addBlockProperty(block, EnumProperty.of("vertical_type", VerticalType.class), VerticalType.FALSE);

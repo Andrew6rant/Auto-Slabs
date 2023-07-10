@@ -6,6 +6,7 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.property.EnumProperty;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -20,6 +21,48 @@ public class PlacementUtil {
     static {
         VERTICAL_TYPE = EnumProperty.of("vertical_type", VerticalType.class);
     }
+
+    public static SlabType calcKleeSlab(BlockState breakState, BlockHitResult cast) {
+        Direction side = cast.getSide();
+        VerticalType verticalType = breakState.get(VERTICAL_TYPE);
+        SlabType breakType = SlabType.DOUBLE;
+        if (verticalType != null) {
+            switch (verticalType) {
+                case FALSE -> breakType = switch (side) {
+                    case UP -> SlabType.BOTTOM;
+                    case DOWN -> SlabType.TOP;
+                    default -> {
+                        var ypos = cast.getPos().y;
+                        var yoffset = ((ypos % 1) + 1) % 1;
+                        if (yoffset > 0.5) yield SlabType.BOTTOM;
+                        else yield SlabType.TOP;
+                    }
+                };
+                case NORTH_SOUTH -> breakType = switch (side) {
+                    case NORTH -> SlabType.BOTTOM;
+                    case SOUTH -> SlabType.TOP;
+                    default -> {
+                        var zpos = cast.getPos().z;
+                        var zoffset = ((zpos % 1) + 1) % 1;
+                        if (zoffset > 0.5) yield SlabType.TOP;
+                        else yield SlabType.BOTTOM;
+                    }
+                };
+                case EAST_WEST -> breakType = switch (side) {
+                    case EAST -> SlabType.BOTTOM;
+                    case WEST -> SlabType.TOP;
+                    default -> {
+                        var xpos = cast.getPos().x;
+                        var xoffset = ((xpos % 1) + 1) % 1;
+                        if (xoffset > 0.5) yield SlabType.BOTTOM;
+                        else yield SlabType.TOP;
+                    }
+                };
+            }
+        }
+        return breakType;
+    }
+
     public static BlockState calcPlacementState(ItemPlacementContext ctx, BlockState state) {
         BlockPos blockPos = ctx.getBlockPos();
         BlockState blockState = ctx.getWorld().getBlockState(blockPos);
