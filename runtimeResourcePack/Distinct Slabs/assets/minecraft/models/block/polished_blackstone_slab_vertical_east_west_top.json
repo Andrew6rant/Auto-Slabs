@@ -1,0 +1,9 @@
+{
+  "parent": "autoslabs:block/slab_vertical_east_west_top_template",
+  "textures": {
+    "bottom": "minecraft:block/polished_blackstone",
+    "side": "minecraft:block/polished_blackstone",
+    "side_vertical": "minecraft:block/polished_blackstone_slab_vertical",
+    "top": "minecraft:block/polished_blackstone_slab_vertical"
+  }
+}

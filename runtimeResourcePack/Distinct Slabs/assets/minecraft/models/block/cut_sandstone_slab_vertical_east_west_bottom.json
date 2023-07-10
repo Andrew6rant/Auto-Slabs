@@ -1,0 +1,9 @@
+{
+  "parent": "autoslabs:block/slab_vertical_east_west_bottom_template",
+  "textures": {
+    "bottom": "minecraft:block/sandstone_top",
+    "side": "minecraft:block/cut_sandstone",
+    "side_vertical": "minecraft:block/cut_sandstone_slab_vertical",
+    "top": "minecraft:block/sandstone_top"
+  }
+}

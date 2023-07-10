@@ -1,0 +1,9 @@
+{
+  "parent": "autoslabs:block/slab_vertical_east_west_top_template",
+  "textures": {
+    "bottom": "minecraft:block/smooth_stone",
+    "side": "minecraft:block/smooth_stone",
+    "side_vertical": "minecraft:block/smooth_stone_slab_vertical",
+    "top": "minecraft:block/smooth_stone_slab_vertical"
+  }
+}

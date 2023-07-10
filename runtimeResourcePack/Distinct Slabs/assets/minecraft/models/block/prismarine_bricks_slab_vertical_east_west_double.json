@@ -1,0 +1,9 @@
+{
+  "parent": "autoslabs:block/slab_vertical_east_west_double_template",
+  "textures": {
+    "bottom": "minecraft:block/prismarine_bricks",
+    "side": "minecraft:block/prismarine_bricks",
+    "side_vertical": "minecraft:block/prismarine_bricks_slab_vertical",
+    "top": "minecraft:block/prismarine_bricks_slab_vertical"
+  }
+}

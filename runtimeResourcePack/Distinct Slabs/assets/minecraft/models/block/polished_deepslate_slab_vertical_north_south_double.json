@@ -1,0 +1,9 @@
+{
+  "parent": "autoslabs:block/slab_vertical_north_south_double_template",
+  "textures": {
+    "bottom": "minecraft:block/polished_deepslate",
+    "side": "minecraft:block/polished_deepslate",
+    "side_vertical": "minecraft:block/polished_deepslate_slab_vertical",
+    "top": "minecraft:block/polished_deepslate_slab"
+  }
+}

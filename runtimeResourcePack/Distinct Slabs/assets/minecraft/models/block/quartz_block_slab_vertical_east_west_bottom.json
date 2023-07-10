@@ -1,0 +1,9 @@
+{
+  "parent": "autoslabs:block/slab_vertical_east_west_bottom_template",
+  "textures": {
+    "bottom": "minecraft:block/quartz_block",
+    "side": "minecraft:block/quartz_block",
+    "side_vertical": "minecraft:block/quartz_block_slab_vertical",
+    "top": "minecraft:block/quartz_block_slab_vertical"
+  }
+}
