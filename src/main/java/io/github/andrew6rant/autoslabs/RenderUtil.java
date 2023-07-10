@@ -44,12 +44,7 @@ public class RenderUtil {
                 RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
                 // default Minecraft line width
                 RenderSystem.lineWidth(Math.max(2.5f, (float)MinecraftClient.getInstance().getWindow().getFramebufferWidth() / 1920.0f * 2.5f));
-                //RenderSystem.disableDepthTest();
                 RenderSystem.disableCull();
-                //RenderSystem.enableBlend();
-                //RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
-                //RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
-
 
                 matrices.push();
                 BlockState state = MinecraftClient.getInstance().world.getBlockState(result.getBlockPos());
@@ -58,7 +53,6 @@ public class RenderUtil {
                 } else {
                     renderOverlayToDirection(null, result.getSide(), matrices, camDif, part);
                 }
-
 
                 matrices.pop();
                 RenderSystem.enableDepthTest();

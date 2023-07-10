@@ -17,8 +17,16 @@ import virtuoel.statement.api.StateRefresher;
 public class AutoSlabs implements ModInitializer {
 	public static final RuntimeResourcePack AUTO_SLABS_RESOURCES = RuntimeResourcePack.create("autoslabs:resources");
 
+
 	@Override
 	public void onInitialize() {
+
+		//Configurator.setLevel(StatementApi.MOD_ID, Level.FATAL);
+
+
+		//Logger.getLogger(StatementApi.MOD_ID).setLevel(Level.OFF);
+		//LoggerContext.
+
 		for (Block block : Registries.BLOCK) {
 			if (block instanceof SlabBlock) {
 				StateRefresher.INSTANCE.addBlockProperty(block, EnumProperty.of("vertical_type", VerticalType.class), VerticalType.FALSE);
@@ -34,11 +42,12 @@ public class AutoSlabs implements ModInitializer {
 						.element(JModel.element().from(0, 0, 0).to(16, 16, 8)
 								.faces(JModel.faces()
 										.north(JModel.face("side").cullface(Direction.NORTH).uv(0, 0, 16, 16))
-										.east(JModel.face("side").cullface(Direction.EAST).uv(0, 0, 8, 16))
+										.east(JModel.face("side").cullface(Direction.EAST).uv(8, 0, 16, 16))
 										.south(JModel.face("side").cullface(Direction.SOUTH).uv(0, 0, 16, 16))
 										.west(JModel.face("side").cullface(Direction.WEST).uv(0, 0, 8, 16))
 										.up(JModel.face("top").cullface(Direction.UP).uv(0, 0, 16, 8))
 										.down(JModel.face("bottom").cullface(Direction.DOWN).uv(0, 0, 16, 8))));
+
 				JModel verticalSlabNorthSouthBottomModel = JModel.model().parent(namespace+":block/"+path)
 						.element(JModel.element().from(0, 0, 8).to(16, 16, 16)
 								.faces(JModel.faces()
@@ -48,6 +57,7 @@ public class AutoSlabs implements ModInitializer {
 										.west(JModel.face("side").cullface(Direction.WEST).uv(8, 0, 16, 16))
 										.up(JModel.face("top").cullface(Direction.UP).uv(0, 8, 16, 16))
 										.down(JModel.face("bottom").cullface(Direction.DOWN).uv(0, 0, 16, 8))));
+
 				JModel verticalSlabEastWestTopModel = JModel.model().parent(namespace+":block/"+path)
 						.element(JModel.element().from(8, 0, 0).to(16, 16, 16)
 								.faces(JModel.faces()
@@ -57,6 +67,7 @@ public class AutoSlabs implements ModInitializer {
 										.west(JModel.face("side").cullface(Direction.WEST).uv(0, 0, 16, 16))
 										.up(JModel.face("top").cullface(Direction.UP).uv(8, 0, 16, 16))
 										.down(JModel.face("bottom").cullface(Direction.DOWN).uv(8, 0, 16, 16))));
+
 				JModel verticalSlabEastWestBottomModel = JModel.model().parent(namespace+":block/"+path)
 						.element(JModel.element().from(0, 0, 0).to(8, 16, 16)
 								.faces(JModel.faces()
