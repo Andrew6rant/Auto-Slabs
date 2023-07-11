@@ -3,6 +3,7 @@ package io.github.andrew6rant.autoslabs;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.SlabType;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
@@ -11,12 +12,76 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 
 import static io.github.andrew6rant.autoslabs.Util.*;
 import static net.minecraft.block.SlabBlock.TYPE;
 import static net.minecraft.block.SlabBlock.WATERLOGGED;
 
 public class PlacementUtil {
+
+    public static BlockState getModelState(BlockState state, VerticalType verticalType, Direction side, BlockHitResult cast) {
+        return switch (verticalType) {
+            case FALSE -> {
+                switch (side) {
+                    // this code technically does not need the brackets or "yield," but IntelliJ won't compile it unless I have it
+                    // https://youtrack.jetbrains.com/issue/IDEA-273889/Switch-expression-rule-should-produce-result-in-all-execution-paths-false-positive
+                    case UP -> {
+                        yield state.getBlock().getDefaultState().with(TYPE, SlabType.TOP);
+                    }
+                    case DOWN -> {
+                        yield state.getBlock().getDefaultState().with(TYPE, SlabType.BOTTOM);
+                    }
+                    default -> {
+                        var yPos = cast.getPos().y;
+                        var yOffset = ((yPos % 1) + 1) % 1;
+                        if (yOffset > 0.5) yield state.getBlock().getDefaultState().with(TYPE, SlabType.TOP);
+                        else yield state.getBlock().getDefaultState().with(TYPE, SlabType.BOTTOM);
+                    }
+                }
+            }
+            case NORTH_SOUTH -> {
+                switch (side) {
+                    case NORTH -> {
+                        yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(TYPE, SlabType.TOP);
+                    }
+                    case SOUTH -> {
+                        yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(TYPE, SlabType.BOTTOM);
+                    }
+                    default -> {
+                        var zPos = cast.getPos().z;
+                        var zOffset = ((zPos % 1) + 1) % 1;
+                        if (zOffset > 0.5) yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(TYPE, SlabType.TOP);
+                        else yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(TYPE, SlabType.BOTTOM);
+                    }
+                }
+            }
+            case EAST_WEST -> {
+                switch (side) {
+                    case EAST -> {
+                        yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, VerticalType.EAST_WEST).with(TYPE, SlabType.TOP);
+                    }
+                    case WEST -> {
+                        yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, VerticalType.EAST_WEST).with(TYPE, SlabType.BOTTOM);
+                    }
+                    default -> {
+                        var xPos = cast.getPos().x;
+                        var xOffset = ((xPos % 1) + 1) % 1;
+                        if (xOffset > 0.5) yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, VerticalType.EAST_WEST).with(TYPE, SlabType.TOP);
+                        else yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, VerticalType.EAST_WEST).with(TYPE, SlabType.BOTTOM);
+                    }
+                }
+            }
+        };
+    }
+
+    public static BlockHitResult calcRaycast(PlayerEntity entity) {
+        Vec3d vec3d = entity.getCameraPosVec(0);
+        Vec3d vec3d2 = entity.getRotationVec(0);
+        Vec3d vec3d3 = vec3d.add(vec3d2.x * 5, vec3d2.y * 5, vec3d2.z * 5);
+        return entity.getWorld().raycast(new RaycastContext(vec3d, vec3d3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity));
+    }
 
     public static SlabType calcKleeSlab(BlockState breakState, BlockHitResult cast) {
         Direction side = cast.getSide();
@@ -28,9 +93,9 @@ public class PlacementUtil {
                     case UP -> SlabType.BOTTOM;
                     case DOWN -> SlabType.TOP;
                     default -> {
-                        var ypos = cast.getPos().y;
-                        var yoffset = ((ypos % 1) + 1) % 1;
-                        if (yoffset > 0.5) yield SlabType.BOTTOM;
+                        var yPos = cast.getPos().y;
+                        var yOffset = ((yPos % 1) + 1) % 1;
+                        if (yOffset > 0.5) yield SlabType.BOTTOM;
                         else yield SlabType.TOP;
                     }
                 };
@@ -38,9 +103,9 @@ public class PlacementUtil {
                     case NORTH -> SlabType.BOTTOM;
                     case SOUTH -> SlabType.TOP;
                     default -> {
-                        var zpos = cast.getPos().z;
-                        var zoffset = ((zpos % 1) + 1) % 1;
-                        if (zoffset > 0.5) yield SlabType.TOP;
+                        var zPos = cast.getPos().z;
+                        var zOffset = ((zPos % 1) + 1) % 1;
+                        if (zOffset > 0.5) yield SlabType.TOP;
                         else yield SlabType.BOTTOM;
                     }
                 };
@@ -48,9 +113,9 @@ public class PlacementUtil {
                     case EAST -> SlabType.BOTTOM;
                     case WEST -> SlabType.TOP;
                     default -> {
-                        var xpos = cast.getPos().x;
-                        var xoffset = ((xpos % 1) + 1) % 1;
-                        if (xoffset > 0.5) yield SlabType.BOTTOM;
+                        var xPos = cast.getPos().x;
+                        var xOffset = ((xPos % 1) + 1) % 1;
+                        if (xOffset > 0.5) yield SlabType.BOTTOM;
                         else yield SlabType.TOP;
                     }
                 };
@@ -125,26 +190,14 @@ public class PlacementUtil {
         if (hitResult.getType() == HitResult.Type.BLOCK) {
             BlockHitResult result = (BlockHitResult) hitResult;
             HitPart part = getHitPart(result);
-            switch (ctxSide) {
-                case UP -> {
-                    return calcUpPlacement(blockState, state, part, fluidState);
-                }
-                case DOWN -> {
-                    return calcDownPlacement(blockState, state, part, fluidState);
-                }
-                case NORTH -> {
-                    return calcNorthPlacement(blockState, state, part, fluidState);
-                }
-                case SOUTH -> {
-                    return calcSouthPlacement(blockState, state, part, fluidState);
-                }
-                case EAST -> {
-                    return calcEastPlacement(blockState, state, part, fluidState);
-                }
-                case WEST -> {
-                    return calcWestPlacement(blockState, state, part, fluidState);
-                }
-            }
+            return switch (ctxSide) {
+                case UP -> calcUpPlacement(blockState, state, part, fluidState);
+                case DOWN -> calcDownPlacement(blockState, state, part, fluidState);
+                case NORTH -> calcNorthPlacement(blockState, state, part, fluidState);
+                case SOUTH -> calcSouthPlacement(blockState, state, part, fluidState);
+                case EAST -> calcEastPlacement(blockState, state, part, fluidState);
+                case WEST -> calcWestPlacement(blockState, state, part, fluidState);
+            };
         }
         return null;
     }

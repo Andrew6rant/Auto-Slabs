@@ -7,8 +7,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -32,13 +30,10 @@ public class ServerPlayerInteractionManagerMixin {
         if (breakState.getBlock() instanceof SlabBlock) {
             SlabType slabType = breakState.get(SlabBlock.TYPE);
             if (slabType != SlabType.DOUBLE) return instance.removeBlock(pos, b);
-            var entity = player;
-            Vec3d vec3d = entity.getCameraPosVec(0);
-            Vec3d vec3d2 = entity.getRotationVec(0);
-            Vec3d vec3d3 = vec3d.add(vec3d2.x * 5, vec3d2.y * 5, vec3d2.z * 5);
-            var cast = entity.getWorld().raycast(new RaycastContext(vec3d, vec3d3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity));
-            SlabType breakType = PlacementUtil.calcKleeSlab(breakState, cast);
-            var removed = instance.removeBlock(pos, b);
+            ServerPlayerEntity entity = player;
+            assert entity != null;
+            SlabType breakType = PlacementUtil.calcKleeSlab(breakState, PlacementUtil.calcRaycast(entity));
+            boolean removed = instance.removeBlock(pos, b);
             world.setBlockState(pos, breakState.with(SlabBlock.TYPE, breakType));
             return removed;
         }
