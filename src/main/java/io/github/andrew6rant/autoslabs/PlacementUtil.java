@@ -52,8 +52,8 @@ public class PlacementUtil {
                     default -> {
                         var zPos = cast.getPos().z;
                         var zOffset = ((zPos % 1) + 1) % 1;
-                        if (zOffset > 0.5) yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(TYPE, SlabType.TOP);
-                        else yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(TYPE, SlabType.BOTTOM);
+                        if (zOffset > 0.5) yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(TYPE, SlabType.BOTTOM);
+                        else yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(TYPE, SlabType.TOP);
                     }
                 }
             }

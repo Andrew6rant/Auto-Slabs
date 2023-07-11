@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static io.github.andrew6rant.autoslabs.Util.*;
+import static net.minecraft.block.enums.SlabType.DOUBLE;
 import static net.minecraft.block.enums.SlabType.TOP;
 
 @Mixin(SlabBlock.class)
@@ -56,6 +57,7 @@ public class SlabBlockMixin extends Block implements Waterloggable {
 		if (slabType != SlabType.DOUBLE) return;
 		var entity = entityContext.getEntity();
 		if (entity == null) return;
+		if (entity.isSneaking()) return;
 		Vec3d vec3d = entity.getCameraPosVec(0);
 		Vec3d vec3d2 = entity.getRotationVec(0);
 		Vec3d vec3d3 = vec3d.add(vec3d2.x * 5, vec3d2.y * 5, vec3d2.z * 5);
@@ -118,7 +120,11 @@ public class SlabBlockMixin extends Block implements Waterloggable {
 
 	@Override
 	public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack stack) {
-		super.afterBreak(world, player, pos, state.with(TYPE, TOP), blockEntity, stack);
+		if (player.isSneaking()) {
+			super.afterBreak(world, player, pos, state.with(TYPE, DOUBLE), blockEntity, stack);
+		} else {
+			super.afterBreak(world, player, pos, state.with(TYPE, TOP), blockEntity, stack);
+		}
 	}
 
 }

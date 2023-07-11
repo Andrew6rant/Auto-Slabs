@@ -1,6 +1,7 @@
 package io.github.andrew6rant.autoslabs.mixin;
 
 import io.github.andrew6rant.autoslabs.PlacementUtil;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.enums.SlabType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -26,12 +27,13 @@ public class ServerPlayerInteractionManagerMixin {
 
     @Redirect(method = "tryBreakBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;removeBlock(Lnet/minecraft/util/math/BlockPos;Z)Z"))
     private boolean tryBreakSlab(ServerWorld instance, BlockPos pos, boolean b) {
-        var breakState = instance.getBlockState(pos);
+        BlockState breakState = instance.getBlockState(pos);
         if (breakState.getBlock() instanceof SlabBlock) {
             SlabType slabType = breakState.get(SlabBlock.TYPE);
             if (slabType != SlabType.DOUBLE) return instance.removeBlock(pos, b);
             ServerPlayerEntity entity = player;
             assert entity != null;
+            if (entity.isSneaking()) return instance.removeBlock(pos, b);
             SlabType breakType = PlacementUtil.calcKleeSlab(breakState, PlacementUtil.calcRaycast(entity));
             boolean removed = instance.removeBlock(pos, b);
             world.setBlockState(pos, breakState.with(SlabBlock.TYPE, breakType));

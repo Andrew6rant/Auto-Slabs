@@ -46,6 +46,7 @@ public class BlockRenderManagerMixin {
             ClientPlayerEntity entity = MinecraftClient.getInstance().player;
             VerticalType verticalType = state.get(VERTICAL_TYPE);
             if (entity == null || verticalType == null) return;
+            if (entity.isSneaking()) return;
             BlockHitResult cast = PlacementUtil.calcRaycast(entity);
             BlockState modelState = PlacementUtil.getModelState(state, verticalType, cast.getSide(), cast);
             BakedModel bakedModel = this.models.getModel(modelState);
