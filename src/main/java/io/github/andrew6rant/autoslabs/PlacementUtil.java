@@ -86,11 +86,11 @@ public class PlacementUtil {
                             }
                         } else if (verticalType == VerticalType.NORTH_SOUTH) {
                             if (slabType == SlabType.BOTTOM) {
-                                if (direction == Direction.NORTH || topHalfZ && direction.getAxis().isVertical()) {
+                                if (direction == Direction.NORTH || !topHalfZ && direction.getAxis().isVertical()) {
                                     return part == HitPart.CENTER;
                                 }
                             } else {
-                                if (direction == Direction.SOUTH || !topHalfZ && direction.getAxis().isVertical()) {
+                                if (direction == Direction.SOUTH || topHalfZ && direction.getAxis().isVertical()) {
                                     return part == HitPart.CENTER;
                                 }
                             }
