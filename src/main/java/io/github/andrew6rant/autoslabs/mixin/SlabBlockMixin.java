@@ -9,8 +9,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
@@ -26,19 +24,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import static io.github.andrew6rant.autoslabs.Util.*;
 import static net.minecraft.block.enums.SlabType.TOP;
 
 @Mixin(SlabBlock.class)
 public class SlabBlockMixin extends Block implements Waterloggable {
 	@Shadow @Final public static BooleanProperty WATERLOGGED;
-	private static final EnumProperty<VerticalType> VERTICAL_TYPE;
-	private static final EnumProperty<SlabType> TYPE;
-	private static final VoxelShape BOTTOM_SHAPE;
-	private static final VoxelShape TOP_SHAPE;
-	private static final VoxelShape VERTICAL_NORTH_SOUTH_BOTTOM_SHAPE;
-	private static final VoxelShape VERTICAL_NORTH_SOUTH_TOP_SHAPE;
-	private static final VoxelShape VERTICAL_EAST_WEST_BOTTOM_SHAPE;
-	private static final VoxelShape VERTICAL_EAST_WEST_TOP_SHAPE;
 
 
 	private SlabBlockMixin(Settings settings) {
@@ -130,14 +121,4 @@ public class SlabBlockMixin extends Block implements Waterloggable {
 		super.afterBreak(world, player, pos, state.with(TYPE, TOP), blockEntity, stack);
 	}
 
-	static {
-		VERTICAL_TYPE = EnumProperty.of("vertical_type", VerticalType.class);
-		TYPE = Properties.SLAB_TYPE;
-		BOTTOM_SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 8.0, 16.0);
-		TOP_SHAPE = Block.createCuboidShape(0.0, 8.0, 0.0, 16.0, 16.0, 16.0);
-		VERTICAL_NORTH_SOUTH_BOTTOM_SHAPE = Block.createCuboidShape(0.0, 0.0, 8.0, 16.0, 16.0, 16.0);
-		VERTICAL_NORTH_SOUTH_TOP_SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 16.0, 8.0);
-		VERTICAL_EAST_WEST_BOTTOM_SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 8.0, 16.0, 16.0);
-		VERTICAL_EAST_WEST_TOP_SHAPE = Block.createCuboidShape(8.0, 0.0, 0.0, 16.0, 16.0, 16.0);
-	}
 }

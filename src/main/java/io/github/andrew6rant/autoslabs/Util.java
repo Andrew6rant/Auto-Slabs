@@ -1,15 +1,18 @@
 package io.github.andrew6rant.autoslabs;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.enums.SlabType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.state.property.EnumProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
 import org.joml.Vector3f;
 
 import java.util.Optional;
@@ -18,8 +21,23 @@ import java.util.Optional;
 public class Util {
 
     public static final EnumProperty<VerticalType> VERTICAL_TYPE;
+    public static final EnumProperty<SlabType> TYPE;
+    public static final VoxelShape BOTTOM_SHAPE;
+    public static final VoxelShape TOP_SHAPE;
+    public static final VoxelShape VERTICAL_NORTH_SOUTH_BOTTOM_SHAPE;
+    public static final VoxelShape VERTICAL_NORTH_SOUTH_TOP_SHAPE;
+    public static final VoxelShape VERTICAL_EAST_WEST_BOTTOM_SHAPE;
+    public static final VoxelShape VERTICAL_EAST_WEST_TOP_SHAPE;
+
     static {
         VERTICAL_TYPE = EnumProperty.of("vertical_type", VerticalType.class);
+        TYPE = Properties.SLAB_TYPE;
+        BOTTOM_SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 8.0, 16.0);
+        TOP_SHAPE = Block.createCuboidShape(0.0, 8.0, 0.0, 16.0, 16.0, 16.0);
+        VERTICAL_NORTH_SOUTH_BOTTOM_SHAPE = Block.createCuboidShape(0.0, 0.0, 8.0, 16.0, 16.0, 16.0);
+        VERTICAL_NORTH_SOUTH_TOP_SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 16.0, 8.0);
+        VERTICAL_EAST_WEST_BOTTOM_SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 8.0, 16.0, 16.0);
+        VERTICAL_EAST_WEST_TOP_SHAPE = Block.createCuboidShape(8.0, 0.0, 0.0, 16.0, 16.0, 16.0);
     }
 
     /**
