@@ -9,24 +9,18 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector3f;
 
 import java.util.Objects;
-import java.util.Optional;
 
-// massive thanks to Schauweg for much of this code
+import static io.github.andrew6rant.autoslabs.Util.*;
+
+// massive thanks to Schauweg for some of this code
 public class RenderUtil {
-    private static final EnumProperty<VerticalType> VERTICAL_TYPE;
-    static {
-        VERTICAL_TYPE = EnumProperty.of("vertical_type", VerticalType.class);
-    }
 
     public static void renderOverlay(MatrixStack matrices, Camera camera) {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
@@ -57,7 +51,6 @@ public class RenderUtil {
                 matrices.pop();
                 RenderSystem.enableDepthTest();
                 RenderSystem.enableCull();
-
             }
         }
     }
@@ -67,7 +60,7 @@ public class RenderUtil {
         float r = 0;
         float g = 0;
         float b = 0;
-        float a = 0.2f;
+        float a = 0.4f;
 
         Vector3f startRaw = new Vector3f((float) (start.x + camDif.x), (float) (start.y + camDif.y), (float) (start.z + camDif.z));
         Vector3f endRaw = new Vector3f((float) (end.x + camDif.x), (float) (end.y + camDif.y), (float) (end.z + camDif.z));
@@ -77,137 +70,98 @@ public class RenderUtil {
 
         buffer.vertex(entry.getPositionMatrix(), endRaw.x, endRaw.y, endRaw.z)
                 .color(r, g, b, a).normal(entry.getNormalMatrix(), normal.x, normal.y, normal.z).next();
-    }
-
-    private static void drawCulledLine(MatrixStack.Entry entry, BufferBuilder buffer, Vec3d camDif, Vector3f start, Vector3f end) {
-        Vector3f normal = getNormalAngle(start, end);
-        float r = 0;
-        float g = 0;
-        float b = 0;
-        float a = 0.2f;
-
-        Vector3f startRaw = new Vector3f((float) (start.x + camDif.x), (float) (start.y + camDif.y), (float) (start.z + camDif.z));
-        Vector3f endRaw = new Vector3f((float) (end.x + camDif.x), (float) (end.y + camDif.y), (float) (end.z + camDif.z));
-
-        buffer.vertex(entry.getPositionMatrix(), startRaw.x, startRaw.y, startRaw.z)
-                .color(r, g, b, a).normal(entry.getNormalMatrix(), normal.x, normal.y, normal.z).next();
-
-        //System.out.println("x: " + endRaw.x + " y: " + endRaw.y+ " z: " + endRaw.z);
-        //.vertex(entry.getPositionMatrix(), Math.min(endRaw.x, 0.5f), Math.min(endRaw.y, 0.5f), Math.min(endRaw.z, 0.5f))
-        //        .color(r, g, b, a).normal(entry.getNormalMatrix(), normal.x, normal.y, normal.z).next();
-        buffer.vertex(entry.getPositionMatrix(), endRaw.x, endRaw.y, endRaw.z)
-                .color(r, g, b, a).normal(entry.getNormalMatrix(), normal.x, normal.y, normal.z).next();
-    }
-
-    public static Vector3f getNormalAngle(Vector3f start, Vector3f end) {
-        float xLength = end.x - start.x;
-        float yLength = end.y - start.y;
-        float zLength = end.z - start.z;
-        float distance = (float) Math.sqrt(xLength * xLength + yLength * yLength + zLength * zLength);
-        xLength /= distance;
-        yLength /= distance;
-        zLength /= distance;
-        return new Vector3f(xLength, yLength, zLength);
     }
 
     private static void renderOverlayToDirection(BlockState state, Direction side, MatrixStack matrixStack, Vec3d camDif, HitPart part) {
-
-        //ArrayList<Vector3f> points = new ArrayList<Vector3f>();
         Vector3f vecBottomLeft = null, vecBottomRight = null, vecTopLeft = null, vecTopRight = null,
                 vecCenterBottomLeft = null, vecCenterBottomRight = null, vecCenterTopLeft = null, vecCenterTopRight = null,
                 vecCenterMiddleLeft = null, vecCenterMiddleRight = null, vecCenterMiddleBottom = null, vecCenterMiddleTop = null;
 
-        //System.out.println(side);
-
         //@formatter:off
         switch (side) {
             case DOWN -> {
-                vecBottomLeft         = new Vector3f(0,      0,      0);
-                vecBottomRight        = new Vector3f(1,      0,      0);
-                vecTopLeft            = new Vector3f(0,      0,      1);
-                vecTopRight           = new Vector3f(1,      0,      1);
-                vecCenterBottomLeft   = new Vector3f(0.25f,  0,      0.25f);
-                vecCenterBottomRight  = new Vector3f(0.75f,  0,      0.25f);
-                vecCenterTopLeft      = new Vector3f(0.25f,  0,      0.75f);
-                vecCenterTopRight     = new Vector3f(0.75f,  0,      0.75f);
-                vecCenterMiddleLeft   = new Vector3f(0.25f,  0,      0.5f);
-                vecCenterMiddleRight  = new Vector3f(0.75f,  0,      0.5f);
-                vecCenterMiddleBottom = new Vector3f(0.5f,   0,      0.25f);
-                vecCenterMiddleTop    = new Vector3f(0.5f,   0,      0.75f);
+                vecBottomLeft         = new Vector3f(0f,    0f,    0f);
+                vecBottomRight        = new Vector3f(1f,    0f,    0f);
+                vecTopLeft            = new Vector3f(0f,    0f,    1f);
+                vecTopRight           = new Vector3f(1f,    0f,    1f);
+                vecCenterBottomLeft   = new Vector3f(0.25f, 0f,    0.25f);
+                vecCenterBottomRight  = new Vector3f(0.75f, 0f,    0.25f);
+                vecCenterTopLeft      = new Vector3f(0.25f, 0f,    0.75f);
+                vecCenterTopRight     = new Vector3f(0.75f, 0f,    0.75f);
+                vecCenterMiddleLeft   = new Vector3f(0.25f, 0f,    0.5f);
+                vecCenterMiddleRight  = new Vector3f(0.75f, 0f,    0.5f);
+                vecCenterMiddleBottom = new Vector3f(0.5f,  0f,    0.25f);
+                vecCenterMiddleTop    = new Vector3f(0.5f,  0f,    0.75f);
             }
             case UP -> {
-                vecBottomLeft         = new Vector3f(1,      1,      0);
-                vecBottomRight        = new Vector3f(0,      1,      0);
-                vecTopLeft            = new Vector3f(1,      1,      1);
-                vecTopRight           = new Vector3f(0,      1,      1);
-                vecCenterBottomLeft   = new Vector3f(0.75f,  1,      0.25f);
-                vecCenterBottomRight  = new Vector3f(0.25f,  1,      0.25f);
-                vecCenterTopLeft      = new Vector3f(0.75f,  1,      0.75f);
-                vecCenterTopRight     = new Vector3f(0.25f,  1,      0.75f);
-                vecCenterMiddleLeft   = new Vector3f(0.75f,  1,      0.5f);
-                vecCenterMiddleRight  = new Vector3f(0.25f,  1,      0.5f);
-                vecCenterMiddleBottom = new Vector3f(0.5f,   1,      0.25f);
-                vecCenterMiddleTop    = new Vector3f(0.5f,   1,      0.75f);
+                vecBottomLeft         = new Vector3f(1f,    1f,    0f);
+                vecBottomRight        = new Vector3f(0f,    1f,    0f);
+                vecTopLeft            = new Vector3f(1f,    1f,    1f);
+                vecTopRight           = new Vector3f(0f,    1f,    1f);
+                vecCenterBottomLeft   = new Vector3f(0.75f, 1f,    0.25f);
+                vecCenterBottomRight  = new Vector3f(0.25f, 1f,    0.25f);
+                vecCenterTopLeft      = new Vector3f(0.75f, 1f,    0.75f);
+                vecCenterTopRight     = new Vector3f(0.25f, 1f,    0.75f);
+                vecCenterMiddleLeft   = new Vector3f(0.75f, 1f,    0.5f);
+                vecCenterMiddleRight  = new Vector3f(0.25f, 1f,    0.5f);
+                vecCenterMiddleBottom = new Vector3f(0.5f,  1f,    0.25f);
+                vecCenterMiddleTop    = new Vector3f(0.5f,  1f,    0.75f);
             }
             case NORTH -> {
-                vecBottomLeft         = new Vector3f(1,      0,      0);
-                vecBottomRight        = new Vector3f(0,      0,      0);
-                vecTopLeft            = new Vector3f(1,      1,      0);
-                vecTopRight           = new Vector3f(0,      1,      0);
-                vecCenterBottomLeft   = new Vector3f(0.75f,  0.25f,  0);
-                vecCenterBottomRight  = new Vector3f(0.25f,  0.25f,  0);
-                vecCenterTopLeft      = new Vector3f(0.75f,  0.75f,  0);
-                vecCenterTopRight     = new Vector3f(0.25f,  0.75f,  0);
-                vecCenterMiddleLeft   = new Vector3f(0.75f,  0.5f,   0);
-                vecCenterMiddleRight  = new Vector3f(0.25f,  0.5f,   0);
-
-                vecCenterMiddleBottom = new Vector3f(0.5f,   0.25f,      0);
-                vecCenterMiddleTop    = new Vector3f(0.5f,   .75f,      0);
+                vecBottomLeft         = new Vector3f(1f,    0f,    0f);
+                vecBottomRight        = new Vector3f(0f,    0f,    0f);
+                vecTopLeft            = new Vector3f(1f,    1f,    0f);
+                vecTopRight           = new Vector3f(0f,    1f,    0f);
+                vecCenterBottomLeft   = new Vector3f(0.75f, 0.25f, 0f);
+                vecCenterBottomRight  = new Vector3f(0.25f, 0.25f, 0f);
+                vecCenterTopLeft      = new Vector3f(0.75f, 0.75f, 0f);
+                vecCenterTopRight     = new Vector3f(0.25f, 0.75f, 0f);
+                vecCenterMiddleLeft   = new Vector3f(0.75f, 0.5f,  0f);
+                vecCenterMiddleRight  = new Vector3f(0.25f, 0.5f,  0f);
+                vecCenterMiddleBottom = new Vector3f(0.5f,  0.25f, 0f);
+                vecCenterMiddleTop    = new Vector3f(0.5f,  .75f,  0f);
             }
             case SOUTH -> {
-                vecBottomLeft         = new Vector3f(0,      0,      1);
-                vecBottomRight        = new Vector3f(1,      0,      1);
-                vecTopLeft            = new Vector3f(0,      1,      1);
-                vecTopRight           = new Vector3f(1,      1,      1);
-                vecCenterBottomLeft   = new Vector3f(0.25f,  0.25f,  1);
-                vecCenterBottomRight  = new Vector3f(0.75f,  0.25f,  1);
-                vecCenterTopLeft      = new Vector3f(0.25f,  0.75f,  1);
-                vecCenterTopRight     = new Vector3f(0.75f,  0.75f,  1);
-                vecCenterMiddleLeft   = new Vector3f(0.25f,  0.5f,   1);
-                vecCenterMiddleRight  = new Vector3f(0.75f,  0.5f,   1);
-
-                vecCenterMiddleBottom = new Vector3f(0.5f,   0.25f,      1);
-                vecCenterMiddleTop    = new Vector3f(0.5f,   0.75f,      1);
+                vecBottomLeft         = new Vector3f(0f,    0f,    1f);
+                vecBottomRight        = new Vector3f(1f,    0f,    1f);
+                vecTopLeft            = new Vector3f(0f,    1f,    1f);
+                vecTopRight           = new Vector3f(1f,    1f,    1f);
+                vecCenterBottomLeft   = new Vector3f(0.25f, 0.25f, 1f);
+                vecCenterBottomRight  = new Vector3f(0.75f, 0.25f, 1f);
+                vecCenterTopLeft      = new Vector3f(0.25f, 0.75f, 1f);
+                vecCenterTopRight     = new Vector3f(0.75f, 0.75f, 1f);
+                vecCenterMiddleLeft   = new Vector3f(0.25f, 0.5f,  1f);
+                vecCenterMiddleRight  = new Vector3f(0.75f, 0.5f,  1f);
+                vecCenterMiddleBottom = new Vector3f(0.5f,  0.25f, 1f);
+                vecCenterMiddleTop    = new Vector3f(0.5f,  0.75f, 1f);
             }
             case WEST -> {
-                vecBottomLeft         = new Vector3f(0,      0,      0);
-                vecBottomRight        = new Vector3f(0,      0,      1);
-                vecTopLeft            = new Vector3f(0,      1,      0);
-                vecTopRight           = new Vector3f(0,      1,      1);
-                vecCenterBottomLeft   = new Vector3f(0,      0.25f,  0.25f);
-                vecCenterBottomRight  = new Vector3f(0,      0.25f,  0.75f);
-                vecCenterTopLeft      = new Vector3f(0,      0.75f,  0.25f);
-                vecCenterTopRight     = new Vector3f(0,      0.75f,  0.75f);
-                vecCenterMiddleLeft   = new Vector3f(0,      0.5f,   0.25f);
-                vecCenterMiddleRight  = new Vector3f(0,      0.5f,   0.75f);
-
-                vecCenterMiddleBottom = new Vector3f(0f,     0.25f,  0.5f);
-                vecCenterMiddleTop    = new Vector3f(0f,     0.75f,  0.5f);
+                vecBottomLeft         = new Vector3f(0f,    0f,    0f);
+                vecBottomRight        = new Vector3f(0f,    0f,    1f);
+                vecTopLeft            = new Vector3f(0f,    1f,    0f);
+                vecTopRight           = new Vector3f(0f,    1f,    1f);
+                vecCenterBottomLeft   = new Vector3f(0f,    0.25f, 0.25f);
+                vecCenterBottomRight  = new Vector3f(0f,    0.25f, 0.75f);
+                vecCenterTopLeft      = new Vector3f(0f,    0.75f, 0.25f);
+                vecCenterTopRight     = new Vector3f(0f,    0.75f, 0.75f);
+                vecCenterMiddleLeft   = new Vector3f(0f,    0.5f,  0.25f);
+                vecCenterMiddleRight  = new Vector3f(0f,    0.5f,  0.75f);
+                vecCenterMiddleBottom = new Vector3f(0f,    0.25f, 0.5f);
+                vecCenterMiddleTop    = new Vector3f(0f,    0.75f, 0.5f);
             }
             case EAST -> {
-                vecBottomLeft         = new Vector3f(1,      0,      1);
-                vecBottomRight        = new Vector3f(1,      0,      0);
-                vecTopLeft            = new Vector3f(1,      1,      1);
-                vecTopRight           = new Vector3f(1,      1,      0);
-                vecCenterBottomLeft   = new Vector3f(1,      0.25f,  0.75f);
-                vecCenterBottomRight  = new Vector3f(1,      0.25f,  0.25f);
-                vecCenterTopLeft      = new Vector3f(1,      0.75f,  0.75f);
-                vecCenterTopRight     = new Vector3f(1,      0.75f,  0.25f);
-                vecCenterMiddleLeft   = new Vector3f(1,      0.5f,   0.75f);
-                vecCenterMiddleRight  = new Vector3f(1,      0.5f,   0.25f);
-
-                vecCenterMiddleBottom = new Vector3f(1,      0.25f,  0.5f);
-                vecCenterMiddleTop    = new Vector3f(1,      0.75f,  0.5f);
+                vecBottomLeft         = new Vector3f(1f,    0f,    1f);
+                vecBottomRight        = new Vector3f(1f,    0f,    0f);
+                vecTopLeft            = new Vector3f(1f,    1f,    1f);
+                vecTopRight           = new Vector3f(1f,    1f,    0f);
+                vecCenterBottomLeft   = new Vector3f(1f,    0.25f, 0.75f);
+                vecCenterBottomRight  = new Vector3f(1f,    0.25f, 0.25f);
+                vecCenterTopLeft      = new Vector3f(1f,    0.75f, 0.75f);
+                vecCenterTopRight     = new Vector3f(1f,    0.75f, 0.25f);
+                vecCenterMiddleLeft   = new Vector3f(1f,    0.5f,  0.75f);
+                vecCenterMiddleRight  = new Vector3f(1f,    0.5f,  0.25f);
+                vecCenterMiddleBottom = new Vector3f(1f,    0.25f, 0.5f);
+                vecCenterMiddleTop    = new Vector3f(1f,    0.75f, 0.5f);
             }
         }
         //@formatter:on
@@ -393,98 +347,6 @@ public class RenderUtil {
         drawLine(entry, buffer, camDif, vecCenterStartCorner, vecCenterEndCorner);
     }
 
-    public static HitPart getHitPart(BlockHitResult hit) {
-        Optional<Vec2f> hitPos = getHitPos(hit);
-        if (hitPos.isEmpty()) return null;
-
-        Vec2f hPos = hitPos.get();
-
-        double x = hPos.x;
-        double y = hPos.y;
-
-        double offH = Math.abs(x - 0.5d);
-        double offV = Math.abs(y - 0.5d);
-
-        if (offH > 0.25d || offV > 0.25d) {
-            if (offH > offV) {
-                return x < 0.5d ? HitPart.LEFT : HitPart.RIGHT;
-            } else {
-                return y < 0.5d ? HitPart.BOTTOM : HitPart.TOP;
-            }
-        } else {
-            return HitPart.CENTER;
-        }
-    }
-
-    private static Optional<Vec2f> getHitPos(BlockHitResult hit) {
-        Direction direction = hit.getSide();
-        BlockPos blockPos = hit.getBlockPos().offset(direction);
-        Vec3d vec3d = hit.getPos().subtract(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-        double x = vec3d.getX();
-        double y = vec3d.getY();
-        double z = vec3d.getZ();
-        return switch (direction) {
-            case NORTH -> Optional.of(new Vec2f((float) (1.0 - x), (float) y));
-            case SOUTH -> Optional.of(new Vec2f((float) x, (float) y));
-            case WEST -> Optional.of(new Vec2f((float) z, (float) y));
-            case EAST -> Optional.of(new Vec2f((float) (1.0 - z), (float) y));
-            case DOWN -> Optional.of(new Vec2f((float) x, (float) z));
-            case UP -> Optional.of(new Vec2f((float) (1.0 - x), (float) z));
-        };
-    }
-
-    /**
-     * Gets the camera offset from a position
-     *
-     * @param camera Camera position
-     * @param pos    Position to get difference
-     * @return Difference
-     */
-    public static Vec3d getCameraOffset(Vec3d camera, BlockPos pos, Direction side) {
-        BlockState state = MinecraftClient.getInstance().world.getBlockState(pos);
-        double xDif = (double) pos.getX() - camera.x;
-        double yDif = (double) pos.getY() - camera.y;
-        double zDif = (double) pos.getZ() - camera.z;
-        if (state.getBlock() instanceof SlabBlock) {
-            SlabType slabType = state.get(SlabBlock.TYPE);
-            VerticalType verticalType = state.get(VERTICAL_TYPE);
-            switch (side) {
-                case UP -> {
-                    if ((slabType == SlabType.BOTTOM) && (verticalType == VerticalType.FALSE)) {
-                        yDif -= 0.5d;
-                    }
-                }
-                case DOWN -> {
-                    if ((slabType == SlabType.TOP) && (verticalType == VerticalType.FALSE)) {
-                        yDif += 0.5d;
-                    }
-                }
-                case NORTH -> {
-                    if ((verticalType == VerticalType.NORTH_SOUTH) && (slabType == SlabType.BOTTOM)) {
-                        zDif += 0.5d;
-                    }
-                }
-                case SOUTH -> {
-                    if ((verticalType == VerticalType.NORTH_SOUTH) && (slabType == SlabType.TOP)) {
-                        zDif -= 0.5d;
-                    }
-                }
-                case WEST -> {
-                    if ((verticalType == VerticalType.EAST_WEST) && (slabType == SlabType.TOP)) {
-                        xDif += 0.5d;
-                    }
-                }
-                case EAST -> {
-                    if ((verticalType == VerticalType.EAST_WEST) && (slabType == SlabType.BOTTOM)) {
-                        xDif -= 0.5d;
-                    }
-                }
-            }
-        }
-        return new Vec3d(xDif, yDif, zDif);
-    }
-
-
     public static void drawQuad(Vector3f pos1, Vector3f pos2, Vector3f pos3, Vector3f pos4, Vec3d camDif, MatrixStack matrixStack) {
 /*
         Vector3f pos1Raw = new Vector3f((float) (pos1.x + camDif.x), (float) (pos1.y + camDif.y), (float) (pos1.z + camDif.z));
@@ -508,12 +370,6 @@ public class RenderUtil {
         */
     }
 
-    public enum HitPart {
-        CENTER,
-        LEFT,
-        RIGHT,
-        BOTTOM,
-        TOP
-    }
+
 }
 

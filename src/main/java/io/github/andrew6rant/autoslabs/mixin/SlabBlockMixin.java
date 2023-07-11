@@ -46,6 +46,11 @@ public class SlabBlockMixin extends Block implements Waterloggable {
 	}
 
 	@Override
+	public boolean canReplace(BlockState state, ItemPlacementContext context) {
+		return PlacementUtil.canReplace(state, context);
+	}
+
+	@Override
 	public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
 		SlabType slabType = state.get(TYPE);
 		VerticalType verticalType = state.get(VERTICAL_TYPE);
