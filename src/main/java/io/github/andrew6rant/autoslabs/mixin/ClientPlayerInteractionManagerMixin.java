@@ -30,10 +30,11 @@ public class ClientPlayerInteractionManagerMixin {
         if (breakState.getBlock() instanceof SlabBlock) {
             SlabType slabType = breakState.get(SlabBlock.TYPE);
             if (slabType != SlabType.DOUBLE) return instance.setBlockState(pos, state, flags);
-            ClientPlayerEntity entity = client.player;
-            assert entity != null;
-            if (entity.isSneaking()) return instance.setBlockState(pos, state, flags);
-            SlabType breakType = PlacementUtil.calcKleeSlab(breakState, PlacementUtil.calcRaycast(entity));
+            ClientPlayerEntity clientPlayer = client.player;
+            assert clientPlayer != null;
+            if (clientPlayer.isSneaking()) return instance.setBlockState(pos, state, flags);
+
+            SlabType breakType = PlacementUtil.calcKleeSlab(breakState, PlacementUtil.calcRaycast(clientPlayer));
             return instance.setBlockState(pos, breakState.with(SlabBlock.TYPE, breakType), flags);
         }
         return instance.setBlockState(pos, state, flags);

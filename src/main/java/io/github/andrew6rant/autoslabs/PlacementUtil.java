@@ -3,7 +3,7 @@ package io.github.andrew6rant.autoslabs;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.SlabType;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
@@ -13,13 +13,82 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.RaycastContext;
 
 import static io.github.andrew6rant.autoslabs.Util.*;
 import static net.minecraft.block.SlabBlock.TYPE;
 import static net.minecraft.block.SlabBlock.WATERLOGGED;
+import static net.minecraft.block.enums.SlabType.TOP;
 
 public class PlacementUtil {
+
+    public static VoxelShape getDynamicOutlineShape(VerticalType verticalType, Direction side, BlockHitResult cast) {
+        return switch (verticalType) {
+            case FALSE -> {
+                switch (side) {
+                    case UP -> {
+                        yield TOP_SHAPE;
+                    }
+                    case DOWN -> {
+                        yield BOTTOM_SHAPE;
+                    }
+                    default -> {
+                        var yPos = cast.getPos().y;
+                        var yOffset = ((yPos % 1) + 1) % 1;
+                        if (yOffset > 0.5) yield TOP_SHAPE;
+                        else yield BOTTOM_SHAPE;
+                    }
+                }
+            }
+            case NORTH_SOUTH -> {
+                switch (side) {
+                    case NORTH -> {
+                        yield VERTICAL_NORTH_SOUTH_TOP_SHAPE;
+                    }
+                    case SOUTH -> {
+                        yield VERTICAL_NORTH_SOUTH_BOTTOM_SHAPE;
+                    }
+                    default -> {
+                        var zPos = cast.getPos().z;
+                        var zOffset = ((zPos % 1) + 1) % 1;
+                        if (zOffset > 0.5) yield VERTICAL_NORTH_SOUTH_BOTTOM_SHAPE;
+                        else yield VERTICAL_NORTH_SOUTH_TOP_SHAPE;
+                    }
+                }
+            }
+            case EAST_WEST -> {
+                switch (side) {
+                    case EAST -> {
+                        yield VERTICAL_EAST_WEST_TOP_SHAPE;
+                    }
+                    case WEST -> {
+                        yield VERTICAL_EAST_WEST_BOTTOM_SHAPE;
+                    }
+                    default -> {
+                        var xPos = cast.getPos().x;
+                        var xOffset = ((xPos % 1) + 1) % 1;
+                        if (xOffset > 0.5) yield VERTICAL_EAST_WEST_TOP_SHAPE;
+                        else yield VERTICAL_EAST_WEST_BOTTOM_SHAPE;
+                    }
+                }
+            }
+        };
+    }
+
+    public static VoxelShape getOutlineShape(BlockState state) {
+        SlabType slabType = state.get(Util.TYPE);
+        VerticalType verticalType = state.get(VERTICAL_TYPE);
+        if (slabType == SlabType.DOUBLE) {
+            return VoxelShapes.fullCube(); // double slab is actually calculated in SlabBlockMixin
+        }
+        return switch (verticalType) {
+            case FALSE -> slabType == TOP ? TOP_SHAPE : BOTTOM_SHAPE;
+            case NORTH_SOUTH -> slabType == TOP ? VERTICAL_NORTH_SOUTH_TOP_SHAPE : VERTICAL_NORTH_SOUTH_BOTTOM_SHAPE;
+            case EAST_WEST -> slabType == TOP ? VERTICAL_EAST_WEST_TOP_SHAPE : VERTICAL_EAST_WEST_BOTTOM_SHAPE;
+        };
+    }
 
     public static BlockState getModelState(BlockState state, VerticalType verticalType, Direction side, BlockHitResult cast) {
         return switch (verticalType) {
@@ -76,7 +145,7 @@ public class PlacementUtil {
         };
     }
 
-    public static BlockHitResult calcRaycast(PlayerEntity entity) {
+    public static BlockHitResult calcRaycast(Entity entity) {
         Vec3d vec3d = entity.getCameraPosVec(0);
         Vec3d vec3d2 = entity.getRotationVec(0);
         Vec3d vec3d3 = vec3d.add(vec3d2.x * 5, vec3d2.y * 5, vec3d2.z * 5);

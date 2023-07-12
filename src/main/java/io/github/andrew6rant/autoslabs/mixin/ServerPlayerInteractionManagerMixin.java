@@ -31,10 +31,11 @@ public class ServerPlayerInteractionManagerMixin {
         if (breakState.getBlock() instanceof SlabBlock) {
             SlabType slabType = breakState.get(SlabBlock.TYPE);
             if (slabType != SlabType.DOUBLE) return instance.removeBlock(pos, b);
-            ServerPlayerEntity entity = player;
-            assert entity != null;
-            if (entity.isSneaking()) return instance.removeBlock(pos, b);
-            SlabType breakType = PlacementUtil.calcKleeSlab(breakState, PlacementUtil.calcRaycast(entity));
+            ServerPlayerEntity serverPlayer = player;
+            assert serverPlayer != null;
+            if (serverPlayer.isSneaking()) return instance.removeBlock(pos, b);
+
+            SlabType breakType = PlacementUtil.calcKleeSlab(breakState, PlacementUtil.calcRaycast(serverPlayer));
             boolean removed = instance.removeBlock(pos, b);
             world.setBlockState(pos, breakState.with(SlabBlock.TYPE, breakType));
             return removed;
