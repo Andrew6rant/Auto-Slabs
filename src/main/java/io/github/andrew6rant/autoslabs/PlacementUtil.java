@@ -1,13 +1,15 @@
 package io.github.andrew6rant.autoslabs;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.SlabBlock;
 import net.minecraft.block.enums.SlabType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -17,6 +19,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.RaycastContext;
 
+import static io.github.andrew6rant.autoslabs.AutoSlabs.MIXED_SLAB_BLOCK;
 import static io.github.andrew6rant.autoslabs.Util.*;
 import static net.minecraft.block.SlabBlock.TYPE;
 import static net.minecraft.block.SlabBlock.WATERLOGGED;
@@ -194,9 +197,9 @@ public class PlacementUtil {
     }
 
     public static boolean canReplace(BlockState state, ItemPlacementContext context) {
-        ItemStack itemStack = context.getStack();
+        Item item = context.getStack().getItem();
         SlabType slabType = state.get(TYPE);
-        if (slabType != SlabType.DOUBLE && itemStack.isOf(state.getBlock().asItem())) {
+        if (slabType != SlabType.DOUBLE && (item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof SlabBlock)) {
             if (context.canReplaceExisting()) {
                 HitResult hitResult = MinecraftClient.getInstance().crosshairTarget;
                 if (hitResult.getType() == HitResult.Type.BLOCK) {
@@ -277,6 +280,10 @@ public class PlacementUtil {
                 return blockState.with(TYPE, SlabType.DOUBLE).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             }
             if (part == HitPart.CENTER) {
+                if (blockState.getBlock() instanceof SlabBlock && blockState.getBlock().getDefaultState() != state) {
+                    System.out.println("YOOOOOOO");
+                    return MIXED_SLAB_BLOCK.getDefaultState();
+                }
                 return state.with(TYPE, SlabType.BOTTOM).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             } else if (part == HitPart.BOTTOM) {
                 return state.with(TYPE, SlabType.TOP).with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);

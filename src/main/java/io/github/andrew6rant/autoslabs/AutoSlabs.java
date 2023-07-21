@@ -1,14 +1,22 @@
 package io.github.andrew6rant.autoslabs;
 
+import io.github.andrew6rant.autoslabs.mixedslabs.MixedSlabBlock;
+import io.github.andrew6rant.autoslabs.mixedslabs.MixedSlabBlockEntity;
 import net.devtech.arrp.api.RRPCallback;
 import net.devtech.arrp.api.RuntimeResourcePack;
 import net.devtech.arrp.json.blockstate.JState;
 import net.devtech.arrp.json.blockstate.JVariant;
 import net.devtech.arrp.json.models.JModel;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.SlabBlock;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.item.BlockItem;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
@@ -17,9 +25,21 @@ import virtuoel.statement.api.StateRefresher;
 public class AutoSlabs implements ModInitializer {
 	public static final RuntimeResourcePack AUTO_SLABS_RESOURCES = RuntimeResourcePack.create("autoslabs:resources");
 
+	public static final MixedSlabBlock MIXED_SLAB_BLOCK = new MixedSlabBlock(FabricBlockSettings.create());
+
+	public static final BlockEntityType<MixedSlabBlockEntity> MIXED_SLAB_BLOCK_ENTITY = Registry.register(
+			Registries.BLOCK_ENTITY_TYPE,
+			new Identifier("tutorial", "demo_block_entity"),
+			FabricBlockEntityTypeBuilder.create(MixedSlabBlockEntity::new, MIXED_SLAB_BLOCK).build()
+	);
+
 
 	@Override
 	public void onInitialize() {
+
+		Registry.register(Registries.BLOCK, new Identifier("autoslabs", "mixed_slab"), MIXED_SLAB_BLOCK);
+		Registry.register(Registries.ITEM, new Identifier("autoslabs", "mixed_slab"), new BlockItem(MIXED_SLAB_BLOCK, new FabricItemSettings()));
+
 
 		for (Block block : Registries.BLOCK) {
 			if (block instanceof SlabBlock) {
