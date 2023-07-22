@@ -282,6 +282,7 @@ public class PlacementUtil {
             if (part == HitPart.CENTER) {
                 if (blockState.getBlock() instanceof SlabBlock && blockState.getBlock().getDefaultState() != state) {
                     System.out.println("YOOOOOOO");
+                    //return new MixedSlabBlock(state, blockState, FabricBlockSettings.create()).getDefaultState(); //MIXED_SLAB_BLOCK.getDefaultState();
                     return MIXED_SLAB_BLOCK.getDefaultState();
                 }
                 return state.with(TYPE, SlabType.BOTTOM).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);

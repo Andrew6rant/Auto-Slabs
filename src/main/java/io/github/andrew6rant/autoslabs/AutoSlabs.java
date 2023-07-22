@@ -12,8 +12,10 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.enums.SlabType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -22,14 +24,16 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import virtuoel.statement.api.StateRefresher;
 
+import static net.minecraft.state.property.Properties.SLAB_TYPE;
+
 public class AutoSlabs implements ModInitializer {
 	public static final RuntimeResourcePack AUTO_SLABS_RESOURCES = RuntimeResourcePack.create("autoslabs:resources");
 
-	public static final MixedSlabBlock MIXED_SLAB_BLOCK = new MixedSlabBlock(FabricBlockSettings.create());
+	public static final MixedSlabBlock MIXED_SLAB_BLOCK = new MixedSlabBlock(Blocks.STONE_SLAB.getDefaultState(), Blocks.OAK_SLAB.getDefaultState().with(SLAB_TYPE, SlabType.TOP), FabricBlockSettings.create());
 
 	public static final BlockEntityType<MixedSlabBlockEntity> MIXED_SLAB_BLOCK_ENTITY = Registry.register(
 			Registries.BLOCK_ENTITY_TYPE,
-			new Identifier("tutorial", "demo_block_entity"),
+			new Identifier("autoslabs", "mixed_slab_entity"),
 			FabricBlockEntityTypeBuilder.create(MixedSlabBlockEntity::new, MIXED_SLAB_BLOCK).build()
 	);
 

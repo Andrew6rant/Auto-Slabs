@@ -2,26 +2,53 @@ package io.github.andrew6rant.autoslabs.mixedslabs;
 
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.block.enums.SlabType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
+
+import static io.github.andrew6rant.autoslabs.AutoSlabs.MIXED_SLAB_BLOCK_ENTITY;
+import static net.minecraft.state.property.Properties.SLAB_TYPE;
 
 public class MixedSlabBlock extends Block implements BlockEntityProvider {
-    public MixedSlabBlock(Settings settings) {
+    public BlockState bottomSlabState; //Blocks.STONE_SLAB.getDefaultState()
+
+    public BlockState topSlabState = Blocks.OAK_SLAB.getDefaultState().with(SLAB_TYPE, SlabType.TOP);
+    public MixedSlabBlock(BlockState bottomSlabState, BlockState topSlabState, Settings settings) {
         super(settings);
+        this.bottomSlabState = bottomSlabState;
+        this.topSlabState = topSlabState;
     }
 
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new MixedSlabBlockEntity(pos, state);
+        return new MixedSlabBlockEntity(pos, state, this.bottomSlabState, this.topSlabState);
     }
 
+    @Override
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        System.out.println("onPlaced!!");
+        if (world.isClient) {
+            System.out.println("client");
+        } else {
+            System.out.println("server");
+            world.getBlockEntity(pos, MIXED_SLAB_BLOCK_ENTITY).ifPresent((blockEntity) -> {
+                blockEntity.setBottomSlabState(bottomSlabState);
+                blockEntity.setTopSlabState(topSlabState);
+            });
+        }
+    }
+
+    public BlockState getBottomSlabState() {
+        return this.bottomSlabState;
+    }
+
+    public BlockState getTopSlabState() {
+        return this.topSlabState;
+    }
+/*
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (!world.isClient) {
@@ -42,7 +69,7 @@ public class MixedSlabBlock extends Block implements BlockEntityProvider {
         }
 
         return ActionResult.PASS;
-    }
+    }*/
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
