@@ -33,21 +33,6 @@ public class MixedSlabBlock extends Block implements BlockEntityProvider {
         return new MixedSlabBlockEntity(pos, state, this.bottomSlabState, this.topSlabState);
     }
 
-    @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        /*
-        System.out.println("onPlaced!!");
-        if (world.isClient) {
-            System.out.println("client");
-        } else {
-            System.out.println("server");
-            world.getBlockEntity(pos, MIXED_SLAB_BLOCK_ENTITY).ifPresent((blockEntity) -> {
-                blockEntity.setBottomSlabState(bottomSlabState);
-                blockEntity.setTopSlabState(topSlabState);
-            });
-        }*/
-    }
-
     public BlockState getBottomSlabState() {
         return this.bottomSlabState;
     }

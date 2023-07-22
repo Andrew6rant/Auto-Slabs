@@ -1,6 +1,7 @@
 package io.github.andrew6rant.autoslabs.mixin;
 
 import io.github.andrew6rant.autoslabs.PlacementUtil;
+import io.github.andrew6rant.autoslabs.mixedslabs.MixedSlabBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.enums.SlabType;
@@ -14,6 +15,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import static net.minecraft.block.enums.SlabType.BOTTOM;
+import static net.minecraft.block.enums.SlabType.TOP;
 
 
 // Massive thanks to Oliver-makes-code for some of the code behind this mixin
@@ -34,8 +38,20 @@ public class ClientPlayerInteractionManagerMixin {
             assert clientPlayer != null;
             if (clientPlayer.isSneaking()) return instance.setBlockState(pos, state, flags);
 
-            SlabType breakType = PlacementUtil.calcKleeSlab(breakState, PlacementUtil.calcRaycast(clientPlayer));
-            return instance.setBlockState(pos, breakState.with(SlabBlock.TYPE, breakType), flags);
+            SlabType remainingSlabType = PlacementUtil.calcKleeSlab(breakState, PlacementUtil.calcRaycast(clientPlayer));
+            return instance.setBlockState(pos, breakState.with(SlabBlock.TYPE, remainingSlabType), flags);
+        } else if (breakState.getBlock() instanceof MixedSlabBlock mixedSlabBlock) {
+            ClientPlayerEntity clientPlayer = client.player;
+            assert clientPlayer != null;
+            if (clientPlayer.isSneaking()) return instance.setBlockState(pos, state, flags);
+
+            SlabType remainingSlabType = PlacementUtil.calcKleeSlab(mixedSlabBlock.getBottomSlabState(), PlacementUtil.calcRaycast(clientPlayer));
+            System.out.println("breakTypeClient:"+remainingSlabType);
+            if (remainingSlabType == BOTTOM) {
+                return instance.setBlockState(pos, mixedSlabBlock.getBottomSlabState().with(SlabBlock.TYPE, remainingSlabType), flags);
+            } else {
+                return instance.setBlockState(pos, mixedSlabBlock.getTopSlabState().with(SlabBlock.TYPE, remainingSlabType), flags);
+            }
         }
         return instance.setBlockState(pos, state, flags);
     }

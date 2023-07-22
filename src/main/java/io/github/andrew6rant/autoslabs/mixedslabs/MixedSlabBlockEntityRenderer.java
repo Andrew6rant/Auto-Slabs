@@ -17,6 +17,8 @@ import net.minecraft.util.math.random.Random;
 
 public class MixedSlabBlockEntityRenderer implements BlockEntityRenderer<MixedSlabBlockEntity> {
 
+    public Random random = Random.create();
+
     public MixedSlabBlockEntityRenderer(BlockEntityRendererFactory.Context ctx) {}
 
     @Override
@@ -29,17 +31,17 @@ public class MixedSlabBlockEntityRenderer implements BlockEntityRenderer<MixedSl
         //MinecraftClient.getInstance().get
         //System.out.println(bottomSlabModel);
         if (bottomSlabModel != null && topSlabModel != null) {
-            int lightAbove = WorldRenderer.getLightmapCoordinates(entity.getWorld(), entity.getPos().up());
+            //int lightAbove = WorldRenderer.getLightmapCoordinates(entity.getWorld(), entity.getPos().up());
             //System.out.println(topSlabModel+", "+bottomSlabModel);
             VertexConsumer consumer = vertexConsumers.getBuffer(RenderLayers.getEntityBlockLayer(entity.getCachedState(), false));
             matrices.push();
             //MatrixStack.Entry entry = matrices.peek();
             for (int i = 0; i <= 5; i++) { // render every face except the inner ones
-                for (BakedQuad quad : bottomSlabModel.getQuads(null, ModelHelper.faceFromIndex(i), Random.create())) {
-                    consumer.quad(matrices.peek(), quad, 1f, 1f, 1f, lightAbove, overlay);
+                for (BakedQuad quad : bottomSlabModel.getQuads(null, ModelHelper.faceFromIndex(i), random)) {
+                    consumer.quad(matrices.peek(), quad, 1f, 1f, 1f, light, overlay);
                 }
-                for (BakedQuad quad : topSlabModel.getQuads(null, ModelHelper.faceFromIndex(i), Random.create())) {
-                    consumer.quad(matrices.peek(), quad, 1f, 1f, 1f, lightAbove, overlay);
+                for (BakedQuad quad : topSlabModel.getQuads(null, ModelHelper.faceFromIndex(i), random)) {
+                    consumer.quad(matrices.peek(), quad, 1f, 1f, 1f, light, overlay);
                 }
             }
             matrices.pop();

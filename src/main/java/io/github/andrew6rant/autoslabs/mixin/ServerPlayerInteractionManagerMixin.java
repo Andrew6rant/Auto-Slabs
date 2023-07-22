@@ -1,9 +1,11 @@
 package io.github.andrew6rant.autoslabs.mixin;
 
 import io.github.andrew6rant.autoslabs.PlacementUtil;
+import io.github.andrew6rant.autoslabs.mixedslabs.MixedSlabBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.enums.SlabType;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.world.ServerWorld;
@@ -13,6 +15,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import static net.minecraft.block.enums.SlabType.BOTTOM;
+import static net.minecraft.block.enums.SlabType.TOP;
 
 // Massive thanks to Oliver-makes-code for some of the code behind this mixin
 // https://github.com/Oliver-makes-code/autoslab/blob/1.19/src/main/java/olivermakesco/de/autoslab/mixin/Mixin_ServerPlayerInteractionManager.java
@@ -35,9 +40,23 @@ public class ServerPlayerInteractionManagerMixin {
             assert serverPlayer != null;
             if (serverPlayer.isSneaking()) return instance.removeBlock(pos, b);
 
-            SlabType breakType = PlacementUtil.calcKleeSlab(breakState, PlacementUtil.calcRaycast(serverPlayer));
+            SlabType remainingSlabType = PlacementUtil.calcKleeSlab(breakState, PlacementUtil.calcRaycast(serverPlayer));
             boolean removed = instance.removeBlock(pos, b);
-            world.setBlockState(pos, breakState.with(SlabBlock.TYPE, breakType));
+            world.setBlockState(pos, breakState.with(SlabBlock.TYPE, remainingSlabType));
+            return removed;
+        } if (breakState.getBlock() instanceof MixedSlabBlock mixedSlabBlock) {
+            ServerPlayerEntity serverPlayer = player;
+            assert serverPlayer != null;
+            if (serverPlayer.isSneaking()) return instance.removeBlock(pos, b);
+
+            SlabType remainingSlabType = PlacementUtil.calcKleeSlab(mixedSlabBlock.getBottomSlabState(), PlacementUtil.calcRaycast(serverPlayer));
+            boolean removed = instance.removeBlock(pos, b);
+            System.out.println("breakTypeServer:"+remainingSlabType);
+            if (remainingSlabType == BOTTOM) {
+                world.setBlockState(pos, mixedSlabBlock.getBottomSlabState().with(SlabBlock.TYPE, remainingSlabType));
+            } else {
+                world.setBlockState(pos, mixedSlabBlock.getTopSlabState().with(SlabBlock.TYPE, remainingSlabType));
+            }
             return removed;
         }
         return instance.removeBlock(pos, b);
