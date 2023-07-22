@@ -15,12 +15,12 @@ public class StateMixin<O, S> {
 
     static {
         // Immense amount of trolling
-        Statement.LOGGER.warn("Logging disabled by AutoSlabs!");
+        /*Statement.LOGGER.error("Statement API's logging has been disabled by AutoSlabs!");
         LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
         Configuration config = ctx.getConfiguration();
         LoggerConfig loggerConfig = config.getLoggerConfig(StatementApi.MOD_ID);
         loggerConfig.setLevel(Level.FATAL);
-        ctx.updateLoggers();
+        ctx.updateLoggers();*/
     }
 
 }

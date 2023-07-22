@@ -15,11 +15,17 @@ import static net.minecraft.state.property.Properties.SLAB_TYPE;
 public class MixedSlabBlock extends Block implements BlockEntityProvider {
     public BlockState bottomSlabState; //Blocks.STONE_SLAB.getDefaultState()
 
-    public BlockState topSlabState = Blocks.OAK_SLAB.getDefaultState().with(SLAB_TYPE, SlabType.TOP);
+    public BlockState topSlabState; //Blocks.OAK_SLAB.getDefaultState().with(SLAB_TYPE, SlabType.TOP)
     public MixedSlabBlock(BlockState bottomSlabState, BlockState topSlabState, Settings settings) {
         super(settings);
         this.bottomSlabState = bottomSlabState;
         this.topSlabState = topSlabState;
+    }
+
+    public BlockState getDefaultStateAndSetUpRender(BlockState bottomSlabState, BlockState topSlabState) {
+        this.bottomSlabState = bottomSlabState;
+        this.topSlabState = topSlabState;
+        return this.getDefaultState();
     }
 
     @Override
@@ -29,6 +35,7 @@ public class MixedSlabBlock extends Block implements BlockEntityProvider {
 
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        /*
         System.out.println("onPlaced!!");
         if (world.isClient) {
             System.out.println("client");
@@ -38,7 +45,7 @@ public class MixedSlabBlock extends Block implements BlockEntityProvider {
                 blockEntity.setBottomSlabState(bottomSlabState);
                 blockEntity.setTopSlabState(topSlabState);
             });
-        }
+        }*/
     }
 
     public BlockState getBottomSlabState() {

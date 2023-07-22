@@ -21,7 +21,7 @@ import java.util.function.UnaryOperator;
 
 // This mixin is based off of ARRP's FileResourcePackProviderMixin,
 // I just need to modify it slightly to automatically enable my BEFORE_USER resource pack
-@Mixin(FileResourcePackProvider.class)
+@Mixin(value = FileResourcePackProvider.class, priority = 900) // default priority is 1000, this will let it run before
 public class FileResourcePackProviderMixin {
     @Shadow @Final private ResourceType type;
     private static final ResourcePackSource RUNTIME = ResourcePackSource.create(getSourceTextSupplier(), true);
@@ -42,7 +42,9 @@ public class FileResourcePackProviderMixin {
         ARRP_LOGGER.info("AUTOSLABS-MODIFIED: ARRP register - before user");
         RRPCallback.BEFORE_USER.invoker().insert(list);
         for (ResourcePack pack : list) {
+            System.out.println("test???"+pack.getName());
             if(pack.getName().equals("Runtime Resource Packautoslabs:resources")) { // only do this on my resource pack
+                System.out.println("real");
                 ARRP_LOGGER.info("AUTOSLABS-MODIFIED: Found autoslabs resource pack, adding to resource pack list");
                 adder.accept(ResourcePackProfile.create(
                         pack.getName(),

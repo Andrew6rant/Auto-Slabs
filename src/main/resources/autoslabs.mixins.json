@@ -3,7 +3,6 @@
   "package": "io.github.andrew6rant.autoslabs.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "FileResourcePackProviderMixin",
     "ServerPlayerInteractionManagerMixin",
     "SlabBlockMixin",
     "StateMixin"
