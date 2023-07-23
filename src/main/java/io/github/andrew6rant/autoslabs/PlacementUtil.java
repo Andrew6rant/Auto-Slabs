@@ -6,6 +6,7 @@ import net.minecraft.block.SlabBlock;
 import net.minecraft.block.enums.SlabType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BlockItem;
@@ -20,6 +21,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.RaycastContext;
+import net.minecraft.world.World;
 
 import static io.github.andrew6rant.autoslabs.AutoSlabs.MIXED_SLAB_BLOCK;
 import static io.github.andrew6rant.autoslabs.Util.*;
@@ -263,6 +265,9 @@ public class PlacementUtil {
     }
 
     public static BlockState calcPlacementState(ItemPlacementContext ctx, BlockState blockStateHeld) {
+        //ItemStack stack = ctx.getStack();
+        //PlayerEntity playerEntity = ctx.getPlayer();
+        //World world = ctx.getWorld();
         BlockPos blockPos = ctx.getBlockPos();
         BlockState blockStateWorld = ctx.getWorld().getBlockState(blockPos);
         Direction ctxSide = ctx.getSide();
@@ -285,6 +290,7 @@ public class PlacementUtil {
 
     public static BlockState calcMixedSlab(BlockState blockStateWorld, BlockState blockStateHeld, BlockState fallbackState) {
         if (blockStateWorld.getBlock() instanceof SlabBlock && blockStateWorld.getBlock().getDefaultState() != blockStateHeld) {
+            //blockStateHeld.getBlock().onPlaced(world, pos, blockStateHeld, playerEntity, stack);
             return MIXED_SLAB_BLOCK.getDefaultStateAndSetUpRender(blockStateWorld.with(WATERLOGGED, false), blockStateHeld.with(SLAB_TYPE, getOppositeSlabType(blockStateWorld)).with(VERTICAL_TYPE, blockStateWorld.get(VERTICAL_TYPE)));
         } else {
             return fallbackState;

@@ -2,6 +2,7 @@ package io.github.andrew6rant.autoslabs.mixin;
 
 import io.github.andrew6rant.autoslabs.PlacementUtil;
 import io.github.andrew6rant.autoslabs.mixedslabs.MixedSlabBlock;
+import io.github.andrew6rant.autoslabs.mixedslabs.MixedSlabBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.enums.SlabType;
@@ -33,6 +34,7 @@ public class ServerPlayerInteractionManagerMixin {
     @Redirect(method = "tryBreakBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;removeBlock(Lnet/minecraft/util/math/BlockPos;Z)Z"))
     private boolean tryBreakSlab(ServerWorld instance, BlockPos pos, boolean b) {
         BlockState breakState = instance.getBlockState(pos);
+        System.out.println("breakState: " + breakState);
         if (breakState.getBlock() instanceof SlabBlock) {
             SlabType slabType = breakState.get(SlabBlock.TYPE);
             if (slabType != SlabType.DOUBLE) return instance.removeBlock(pos, b);
@@ -44,18 +46,24 @@ public class ServerPlayerInteractionManagerMixin {
             boolean removed = instance.removeBlock(pos, b);
             world.setBlockState(pos, breakState.with(SlabBlock.TYPE, remainingSlabType));
             return removed;
-        } if (breakState.getBlock() instanceof MixedSlabBlock mixedSlabBlock) {
+        } else if (breakState.getBlock() instanceof MixedSlabBlock mixedSlabBlock) {
             ServerPlayerEntity serverPlayer = player;
             assert serverPlayer != null;
             if (serverPlayer.isSneaking()) return instance.removeBlock(pos, b);
 
             SlabType remainingSlabType = PlacementUtil.calcKleeSlab(mixedSlabBlock.getBottomSlabState(), PlacementUtil.calcRaycast(serverPlayer));
+
+            //System.out.println("remainingSlabType: " + remainingSlabType);
+            BlockState cacheStateBottom = ((MixedSlabBlockEntity)(instance.getBlockEntity(pos))).getBottomSlabState();
+            BlockState cacheStateTop = ((MixedSlabBlockEntity)(instance.getBlockEntity(pos))).getTopSlabState();
+            //System.out.println("cahce: " + cacheStateBottom+", "+cacheStateTop);
             boolean removed = instance.removeBlock(pos, b);
-            System.out.println("breakTypeServer:"+remainingSlabType);
+            //System.out.println("breakTypeServer!!!!!!!!!:"+remainingSlabType);
+
             if (remainingSlabType == BOTTOM) {
-                world.setBlockState(pos, mixedSlabBlock.getBottomSlabState().with(SlabBlock.TYPE, remainingSlabType));
+                world.setBlockState(pos, cacheStateBottom.with(SlabBlock.TYPE, remainingSlabType));
             } else {
-                world.setBlockState(pos, mixedSlabBlock.getTopSlabState().with(SlabBlock.TYPE, remainingSlabType));
+                world.setBlockState(pos, cacheStateTop.with(SlabBlock.TYPE, remainingSlabType));
             }
             return removed;
         }

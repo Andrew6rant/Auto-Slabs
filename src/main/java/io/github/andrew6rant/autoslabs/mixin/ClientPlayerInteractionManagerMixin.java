@@ -2,6 +2,7 @@ package io.github.andrew6rant.autoslabs.mixin;
 
 import io.github.andrew6rant.autoslabs.PlacementUtil;
 import io.github.andrew6rant.autoslabs.mixedslabs.MixedSlabBlock;
+import io.github.andrew6rant.autoslabs.mixedslabs.MixedSlabBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.enums.SlabType;
@@ -46,11 +47,13 @@ public class ClientPlayerInteractionManagerMixin {
             if (clientPlayer.isSneaking()) return instance.setBlockState(pos, state, flags);
 
             SlabType remainingSlabType = PlacementUtil.calcKleeSlab(mixedSlabBlock.getBottomSlabState(), PlacementUtil.calcRaycast(clientPlayer));
-            System.out.println("breakTypeClient:"+remainingSlabType);
+            BlockState cacheStateBottom = ((MixedSlabBlockEntity)(instance.getBlockEntity(pos))).getBottomSlabState();
+            BlockState cacheStateTop = ((MixedSlabBlockEntity)(instance.getBlockEntity(pos))).getTopSlabState();
+            //System.out.println("breakTypeClient:"+remainingSlabType);
             if (remainingSlabType == BOTTOM) {
-                return instance.setBlockState(pos, mixedSlabBlock.getBottomSlabState().with(SlabBlock.TYPE, remainingSlabType), flags);
+                return instance.setBlockState(pos, cacheStateBottom.with(SlabBlock.TYPE, remainingSlabType), flags);
             } else {
-                return instance.setBlockState(pos, mixedSlabBlock.getTopSlabState().with(SlabBlock.TYPE, remainingSlabType), flags);
+                return instance.setBlockState(pos, cacheStateTop.with(SlabBlock.TYPE, remainingSlabType), flags);
             }
         }
         return instance.setBlockState(pos, state, flags);

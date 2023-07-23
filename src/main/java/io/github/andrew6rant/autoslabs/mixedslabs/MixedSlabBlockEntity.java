@@ -2,7 +2,9 @@ package io.github.andrew6rant.autoslabs.mixedslabs;
 
 import io.github.andrew6rant.autoslabs.AutoSlabs;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.enums.SlabType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtOps;
@@ -12,11 +14,13 @@ import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
+import static net.minecraft.state.property.Properties.SLAB_TYPE;
+
 public class MixedSlabBlockEntity extends BlockEntity {
 
-    public BlockState bottomSlabState;
+    public BlockState bottomSlabState = Blocks.STONE_SLAB.getDefaultState();
 
-    public BlockState topSlabState;
+    public BlockState topSlabState = Blocks.OAK_SLAB.getDefaultState().with(SLAB_TYPE, SlabType.TOP);
 
     public MixedSlabBlockEntity(BlockPos pos, BlockState state) {
         super(AutoSlabs.MIXED_SLAB_BLOCK_ENTITY, pos, state);
@@ -28,6 +32,14 @@ public class MixedSlabBlockEntity extends BlockEntity {
         super(AutoSlabs.MIXED_SLAB_BLOCK_ENTITY, pos, state);
         this.bottomSlabState = bottomSlabState;
         this.topSlabState = topSlabState;
+    }
+
+    public BlockState getBottomSlabState() {
+        return this.bottomSlabState;
+    }
+
+    public BlockState getTopSlabState() {
+        return this.topSlabState;
     }
 
     public void setBottomSlabState(BlockState bottomSlabState) {
