@@ -69,7 +69,7 @@ public class SlabBlockMixin extends Block implements Waterloggable {
 	@Override
 	public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack stack) {
 		if (player.isSneaking()) {
-			super.afterBreak(world, player, pos, state.with(TYPE, DOUBLE), blockEntity, stack);
+			super.afterBreak(world, player, pos, state, blockEntity, stack);
 		} else {
 			super.afterBreak(world, player, pos, state.with(TYPE, TOP), blockEntity, stack);
 		}

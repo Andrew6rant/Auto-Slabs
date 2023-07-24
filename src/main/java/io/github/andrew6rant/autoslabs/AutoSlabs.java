@@ -29,7 +29,7 @@ import static net.minecraft.state.property.Properties.SLAB_TYPE;
 public class AutoSlabs implements ModInitializer {
 	public static final RuntimeResourcePack AUTO_SLABS_RESOURCES = RuntimeResourcePack.create("autoslabs:resources");
 
-	public static final MixedSlabBlock MIXED_SLAB_BLOCK = new MixedSlabBlock(Blocks.STONE_SLAB.getDefaultState(), Blocks.OAK_SLAB.getDefaultState().with(SLAB_TYPE, SlabType.TOP), FabricBlockSettings.create().nonOpaque());
+	public static final MixedSlabBlock MIXED_SLAB_BLOCK = new MixedSlabBlock(Blocks.STONE_SLAB.getDefaultState(), Blocks.OAK_SLAB.getDefaultState().with(SLAB_TYPE, SlabType.TOP), FabricBlockSettings.create().nonOpaque().ticksRandomly());
 
 	public static final BlockEntityType<MixedSlabBlockEntity> MIXED_SLAB_BLOCK_ENTITY = Registry.register(
 			Registries.BLOCK_ENTITY_TYPE,

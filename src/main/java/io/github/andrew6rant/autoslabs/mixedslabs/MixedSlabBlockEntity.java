@@ -24,8 +24,8 @@ public class MixedSlabBlockEntity extends BlockEntity {
 
     public MixedSlabBlockEntity(BlockPos pos, BlockState state) {
         super(AutoSlabs.MIXED_SLAB_BLOCK_ENTITY, pos, state);
-        this.bottomSlabState = ((MixedSlabBlock)state.getBlock()).getBottomSlabState();
-        this.topSlabState = ((MixedSlabBlock)state.getBlock()).getTopSlabState();
+        //this.bottomSlabState = ((MixedSlabBlock)state.getBlock()).getBottomSlabState();
+        //this.topSlabState = ((MixedSlabBlock)state.getBlock()).getTopSlabState();
     }
 
     public MixedSlabBlockEntity(BlockPos pos, BlockState state, BlockState bottomSlabState, BlockState topSlabState) {
@@ -44,16 +44,23 @@ public class MixedSlabBlockEntity extends BlockEntity {
 
     public void setBottomSlabState(BlockState bottomSlabState) {
         this.bottomSlabState = bottomSlabState;
+        this.updateListeners();
     }
 
     public void setTopSlabState(BlockState topSlabState) {
         this.topSlabState = topSlabState;
+        this.updateListeners();
     }
 
     @Nullable
     @Override
     public Packet<ClientPlayPacketListener> toUpdatePacket() {
         return BlockEntityUpdateS2CPacket.create(this);
+    }
+
+    private void updateListeners() {
+        this.markDirty();
+        this.getWorld().updateListeners(this.getPos(), this.getCachedState(), this.getCachedState(), 3);
     }
 
     @Override

@@ -158,6 +158,7 @@ public class PlacementUtil {
         Vec3d vec3d = entity.getCameraPosVec(0);
         Vec3d vec3d2 = entity.getRotationVec(0);
         Vec3d vec3d3 = vec3d.add(vec3d2.x * 5, vec3d2.y * 5, vec3d2.z * 5);
+        //System.out.println(vec3d3);
         return entity.getWorld().raycast(new RaycastContext(vec3d, vec3d3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity));
     }
 

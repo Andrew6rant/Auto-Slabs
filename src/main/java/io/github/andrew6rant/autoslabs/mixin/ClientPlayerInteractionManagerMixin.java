@@ -17,6 +17,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+import java.util.Objects;
+
 import static net.minecraft.block.enums.SlabType.BOTTOM;
 import static net.minecraft.block.enums.SlabType.TOP;
 
@@ -47,9 +49,9 @@ public class ClientPlayerInteractionManagerMixin {
             if (clientPlayer.isSneaking()) return instance.setBlockState(pos, state, flags);
 
             SlabType remainingSlabType = PlacementUtil.calcKleeSlab(mixedSlabBlock.getBottomSlabState(), PlacementUtil.calcRaycast(clientPlayer));
-            BlockState cacheStateBottom = ((MixedSlabBlockEntity)(instance.getBlockEntity(pos))).getBottomSlabState();
-            BlockState cacheStateTop = ((MixedSlabBlockEntity)(instance.getBlockEntity(pos))).getTopSlabState();
-            //System.out.println("breakTypeClient:"+remainingSlabType);
+            BlockState cacheStateBottom = ((MixedSlabBlockEntity)(Objects.requireNonNull(instance.getBlockEntity(pos)))).getBottomSlabState();
+            BlockState cacheStateTop = ((MixedSlabBlockEntity)(Objects.requireNonNull(instance.getBlockEntity(pos)))).getTopSlabState();
+            System.out.println("remainingSlabType:"+remainingSlabType);
             if (remainingSlabType == BOTTOM) {
                 return instance.setBlockState(pos, cacheStateBottom.with(SlabBlock.TYPE, remainingSlabType), flags);
             } else {

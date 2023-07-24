@@ -17,6 +17,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+import java.util.Objects;
+
 import static net.minecraft.block.enums.SlabType.BOTTOM;
 import static net.minecraft.block.enums.SlabType.TOP;
 
@@ -34,7 +36,7 @@ public class ServerPlayerInteractionManagerMixin {
     @Redirect(method = "tryBreakBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;removeBlock(Lnet/minecraft/util/math/BlockPos;Z)Z"))
     private boolean tryBreakSlab(ServerWorld instance, BlockPos pos, boolean b) {
         BlockState breakState = instance.getBlockState(pos);
-        System.out.println("breakState: " + breakState);
+        //System.out.println("breakState: " + breakState);
         if (breakState.getBlock() instanceof SlabBlock) {
             SlabType slabType = breakState.get(SlabBlock.TYPE);
             if (slabType != SlabType.DOUBLE) return instance.removeBlock(pos, b);
@@ -57,9 +59,10 @@ public class ServerPlayerInteractionManagerMixin {
             BlockState cacheStateBottom = ((MixedSlabBlockEntity)(instance.getBlockEntity(pos))).getBottomSlabState();
             BlockState cacheStateTop = ((MixedSlabBlockEntity)(instance.getBlockEntity(pos))).getTopSlabState();
             //System.out.println("cahce: " + cacheStateBottom+", "+cacheStateTop);
+            //System.out.println("cacheStateBottomServer:"+cacheStateBottom);
             boolean removed = instance.removeBlock(pos, b);
             //System.out.println("breakTypeServer!!!!!!!!!:"+remainingSlabType);
-
+            //System.out.println("remainingSlabType:"+remainingSlabType);
             if (remainingSlabType == BOTTOM) {
                 world.setBlockState(pos, cacheStateBottom.with(SlabBlock.TYPE, remainingSlabType));
             } else {

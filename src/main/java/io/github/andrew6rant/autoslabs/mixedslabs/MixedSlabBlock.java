@@ -18,6 +18,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
@@ -59,11 +61,22 @@ public class MixedSlabBlock extends Block implements BlockEntityProvider {
     public BlockState getTopSlabState() {
         return this.topSlabState;
     }
-    /*@Override
-    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
-        this.bottomSlabState.getBlock().randomDisplayTick(state, world, pos, random);
-        this.topSlabState.getBlock().randomDisplayTick(state, world, pos, random);
+
+    public BlockState getBottomSlabState(BlockEntity mixedSlabBlockEntity) {
+        return ((MixedSlabBlockEntity)mixedSlabBlockEntity).getBottomSlabState();
     }
+
+    public BlockState getTopSlabState(BlockEntity mixedSlabBlockEntity) {
+        return ((MixedSlabBlockEntity)mixedSlabBlockEntity).getTopSlabState();
+    }
+    @Override
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        BlockEntity mixedSlabBlockEntity = world.getBlockEntity(pos);
+        getBottomSlabState(mixedSlabBlockEntity).getBlock().randomDisplayTick(state, world, pos, random);
+        getTopSlabState(mixedSlabBlockEntity).getBlock().randomDisplayTick(state, world, pos, random);
+        //this.bottomSlabState.getBlock().randomDisplayTick(state, world, pos, random);
+        //this.topSlabState.getBlock().randomDisplayTick(state, world, pos, random);
+    }/*
 
     @Override
     public void onBlockBreakStart(BlockState state, World world, BlockPos pos, PlayerEntity player) {
@@ -90,22 +103,50 @@ public class MixedSlabBlock extends Block implements BlockEntityProvider {
     }
 
     @Override
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        //this.bottomSlabState.getBlock().randomTick(this.bottomSlabState, world, pos, random);
+        //this.topSlabState.getBlock().randomTick(this.topSlabState, world, pos, random);
+        //System.out.println("randomticking! "+ state);
+        BlockEntity mixedSlabBlockEntity = world.getBlockEntity(pos);
+        BlockState bottomSlabState = getBottomSlabState(mixedSlabBlockEntity);
+        BlockState topSlabState = getTopSlabState(mixedSlabBlockEntity);
+        bottomSlabState.getBlock().randomTick(bottomSlabState, world, pos, random);
+        topSlabState.getBlock().randomTick(topSlabState, world, pos, random);
+
+        /*if (this.bottomSlabState.getBlock() instanceof OxidizableSlabBlock) {
+            ((OxidizableSlabBlock)(this.bottomSlabState.getBlock())).tickDegradation(state, world, pos, random);
+        } else if (this.topSlabState.getBlock() instanceof OxidizableSlabBlock) {
+            ((OxidizableSlabBlock)(this.bottomSlabState.getBlock())).tickDegradation(state, world, pos, random);
+        }*/
+    }
+
+    @Override
     public boolean hasRandomTicks(BlockState state) {
-        return this.bottomSlabState.getBlock().hasRandomTicks(state) || this.topSlabState.getBlock().hasRandomTicks(state);
+        //BlockState bottomSlabState = getBottomSlabState(mixedSlabBlockEntity);
+        //BlockState topSlabState = getTopSlabState(mixedSlabBlockEntity);
+        //System.out.println("bottomSlabState: "+bottomSlabState+" topSlabState: "+topSlabState);
+        //return this.bottomSlabState.getBlock().hasRandomTicks(state) || this.topSlabState.getBlock().hasRandomTicks(state);
+        return true;
     }
 
     @Override
     public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack stack) {
+        System.out.println("ok: "+blockEntity);
         if (player.isSneaking()) {
-            this.bottomSlabState.getBlock().afterBreak(world, player, pos, this.bottomSlabState, null, stack);
-            this.topSlabState.getBlock().afterBreak(world, player, pos, this.topSlabState, null, stack);
+            this.bottomSlabState.getBlock().afterBreak(world, player, pos, this.bottomSlabState.with(TYPE, TOP), null, stack);
+            this.topSlabState.getBlock().afterBreak(world, player, pos, this.topSlabState.with(TYPE, TOP), null, stack);
         } else {
-            if (PlacementUtil.calcKleeSlab(this.bottomSlabState, PlacementUtil.calcRaycast(player)) == BOTTOM) {
+            if (PlacementUtil.calcKleeSlab(this.bottomSlabState, PlacementUtil.calcRaycast(player)) == TOP) { // yes I know this is backwards
                 this.bottomSlabState.getBlock().afterBreak(world, player, pos, this.bottomSlabState, null, stack);
             } else {
                 this.topSlabState.getBlock().afterBreak(world, player, pos, this.topSlabState, null, stack);
             }
         }
+    }
+
+    @Override
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return VoxelShapes.fullCube(); // double slab is actually calculated in MixedSlabBlockMixin
     }
 
     /*@Override
