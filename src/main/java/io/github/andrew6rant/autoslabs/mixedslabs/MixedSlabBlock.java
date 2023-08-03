@@ -126,7 +126,7 @@ public class MixedSlabBlock extends Block implements BlockEntityProvider {
         //BlockState topSlabState = getTopSlabState(mixedSlabBlockEntity);
         //System.out.println("bottomSlabState: "+bottomSlabState+" topSlabState: "+topSlabState);
         //return this.bottomSlabState.getBlock().hasRandomTicks(state) || this.topSlabState.getBlock().hasRandomTicks(state);
-        return true;
+        return false;
     }
 
     @Override
@@ -161,7 +161,7 @@ public class MixedSlabBlock extends Block implements BlockEntityProvider {
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.ENTITYBLOCK_ANIMATED;
+        return BlockRenderType.MODEL;
     }
 
     /* //implemented in onBroken

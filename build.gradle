@@ -86,8 +86,8 @@ publishing {
 	}
 }
 
-afterEvaluate {
-	loom.runs.configureEach {
-		vmArg "-javaagent:${ configurations.compileClasspath.find { it.name.contains("sponge-mixin") } }"
-	}
-}
+//afterEvaluate {
+//	loom.runs.configureEach {
+//		vmArg "-javaagent:${ configurations.compileClasspath.find { it.name.contains("sponge-mixin") } }"
+//	}
+//}

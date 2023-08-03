@@ -1,17 +1,10 @@
 package io.github.andrew6rant.autoslabs.mixedslabs;
 
-import net.fabricmc.fabric.api.renderer.v1.model.ModelHelper;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayers;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.block.BlockModels;
+import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.BakedModelManager;
-import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.random.Random;
 
@@ -23,8 +16,14 @@ public class MixedSlabBlockEntityRenderer implements BlockEntityRenderer<MixedSl
 
     @Override
     public void render(MixedSlabBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        BakedModelManager manager = MinecraftClient.getInstance().getBakedModelManager();
-        BlockModels blockModels = manager.getBlockModels();
+        //BakedModelManager manager = MinecraftClient.getInstance().getBakedModelManager();
+        BlockRenderManager renderManager = MinecraftClient.getInstance().getBlockRenderManager();
+        //BlockModels blockModels = manager.getBlockModels();
+
+        renderManager.renderBlockAsEntity(entity.bottomSlabState, matrices, vertexConsumers, light, overlay);
+        renderManager.renderBlockAsEntity(entity.topSlabState, matrices, vertexConsumers, light, overlay);
+
+        /*
         BakedModel bottomSlabModel = blockModels.getModel(entity.bottomSlabState);
         BakedModel topSlabModel = blockModels.getModel(entity.topSlabState);
         //MinecraftClient.getInstance().getItemRenderer().rend(manager.getModel(new Identifier("minecraft:oak_slab")));
@@ -46,6 +45,7 @@ public class MixedSlabBlockEntityRenderer implements BlockEntityRenderer<MixedSl
             }
             matrices.pop();
         }
+         */
 
     }
 }
