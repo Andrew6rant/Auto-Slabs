@@ -21,7 +21,7 @@ import java.util.function.UnaryOperator;
 
 // This mixin is based off of ARRP's FileResourcePackProviderMixin,
 // I just need to modify it slightly to automatically enable my BEFORE_USER resource pack
-@Mixin(FileResourcePackProvider.class)
+@Mixin(value = FileResourcePackProvider.class, priority = 1100) // default priority is 1000, this will let it run after
 public class FileResourcePackProviderMixin {
     @Shadow @Final private ResourceType type;
     private static final ResourcePackSource RUNTIME = ResourcePackSource.create(getSourceTextSupplier(), true);
@@ -47,7 +47,7 @@ public class FileResourcePackProviderMixin {
                 adder.accept(ResourcePackProfile.create(
                         pack.getName(),
                         Text.literal(pack.getName()),
-                        true, // this is the difference from ARRP's mixin (I want my pack to be enabled by default)
+                        true, // this is the main difference from ARRP's mixin (I want my pack to be enabled by default)
                         (name) -> pack,
                         this.type,
                         ResourcePackProfile.InsertionPosition.TOP,
