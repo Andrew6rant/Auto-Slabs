@@ -23,6 +23,9 @@ repositories {
     maven {
 		url = uri("https://ueaj.dev/maven")
     }
+	maven {
+		url "https://maven.terraformersmc.com/releases/"
+	}
 }
 
 dependencies {
@@ -42,6 +45,10 @@ dependencies {
         exclude group: "net.fabricmc.fabric-api"
     })
     modImplementation("net.devtech:arrp:${project.arrp_version}")
+
+	modImplementation ("com.terraformersmc:modmenu:${project.modmenu_version}") {
+		exclude module: "fabric-api"
+	}
 }
 
 processResources {

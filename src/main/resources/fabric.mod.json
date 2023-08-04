@@ -20,6 +20,9 @@
 		],
 		"client": [
 			"io.github.andrew6rant.autoslabs.AutoSlabsClient"
+		],
+		"modmenu": [
+			"io.github.andrew6rant.autoslabs.config.ConfigEntrypoint"
 		]
 	},
 	"mixins": [

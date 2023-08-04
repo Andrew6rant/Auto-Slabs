@@ -1,5 +1,6 @@
 package io.github.andrew6rant.autoslabs.mixin;
 
+import io.github.andrew6rant.autoslabs.config.ClientConfig;
 import net.minecraft.state.State;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -15,9 +16,11 @@ import virtuoel.statement.api.StatementApi;
 public class StateMixin<O, S> {
 
     static {
-        // Immense amount of trolling
-        Statement.LOGGER.error("Statement API's logging has been disabled by AutoSlabs!");
-        Configurator.setLevel(StatementApi.MOD_ID, Level.FATAL);
+        if (ClientConfig.suppressStatementAPILogger) {
+            // Immense amount of trolling
+            Statement.LOGGER.error("Statement API's logging has been disabled by AutoSlabs!");
+            Configurator.setLevel(StatementApi.MOD_ID, Level.FATAL);
+        }
     }
 
 }
