@@ -33,7 +33,7 @@ public class FileResourcePackProviderMixin {
     }
 
     @Inject(method = "register", at = @At("HEAD"))
-    public void register(
+    public void autoslabs$registerRuntimeResourcePack(
             Consumer<ResourcePackProfile> adder,
             CallbackInfo ci
     ) throws ExecutionException, InterruptedException {

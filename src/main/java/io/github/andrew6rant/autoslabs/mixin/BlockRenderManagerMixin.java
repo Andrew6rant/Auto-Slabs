@@ -39,7 +39,7 @@ public class BlockRenderManagerMixin {
     @Shadow @Final private Random random;
 
     @Inject(method = "renderDamage", at = @At("HEAD"), cancellable = true)
-    public void renderSlabDamage(BlockState state, BlockPos pos, BlockRenderView world, MatrixStack matrices, VertexConsumer vertexConsumer, CallbackInfo ci) {
+    public void autoslabs$renderSlabDamage(BlockState state, BlockPos pos, BlockRenderView world, MatrixStack matrices, VertexConsumer vertexConsumer, CallbackInfo ci) {
         if(!(state.getBlock() instanceof SlabBlock)) return;
         if (state.getRenderType() == BlockRenderType.MODEL) {
             if (state.get(TYPE) != SlabType.DOUBLE) return;

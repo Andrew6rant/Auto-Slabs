@@ -26,7 +26,7 @@ public class ServerPlayerInteractionManagerMixin {
     protected ServerWorld world;
 
     @Redirect(method = "tryBreakBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;removeBlock(Lnet/minecraft/util/math/BlockPos;Z)Z"))
-    private boolean tryBreakSlab(ServerWorld instance, BlockPos pos, boolean b) {
+    private boolean autoslabs$tryBreakSlab(ServerWorld instance, BlockPos pos, boolean b) {
         BlockState breakState = instance.getBlockState(pos);
         if (breakState.getBlock() instanceof SlabBlock) {
             SlabType slabType = breakState.get(SlabBlock.TYPE);

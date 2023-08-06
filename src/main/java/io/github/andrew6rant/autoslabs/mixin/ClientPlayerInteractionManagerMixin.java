@@ -25,7 +25,7 @@ public class ClientPlayerInteractionManagerMixin {
     private MinecraftClient client;
 
     @Redirect(method = "breakBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;I)Z"))
-    private boolean tryBreakSlab(World instance, BlockPos pos, BlockState state, int flags) {
+    private boolean autoslabs$tryBreakSlab(World instance, BlockPos pos, BlockState state, int flags) {
         var breakState = instance.getBlockState(pos);
         if (breakState.getBlock() instanceof SlabBlock) {
             SlabType slabType = breakState.get(SlabBlock.TYPE);
