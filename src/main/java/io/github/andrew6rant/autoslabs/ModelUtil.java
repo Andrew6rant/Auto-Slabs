@@ -23,12 +23,15 @@ public class ModelUtil {
         Identifier vertical_east_west_bottom_slab = new Identifier(namespace, "block/"+path + "_vertical_east_west_bottom");
 
         // Yes, I know these models are incredibly inefficient, but I need to parent them this way for the best mod compatibility.
+
+        // Disable the cull face for the vertical slabs on the to be half empty side.
+        // Or sodium will trust you and think the face is cullable
         JModel verticalSlabNorthSouthTopModel = JModel.model().parent(namespace+":block/"+path)
                 .element(JModel.element().from(0, 0, 0).to(16, 16, 8)
                         .faces(JModel.faces()
                                 .north(JModel.face("side").cullface(Direction.NORTH).uv(0, 0, 16, 16))
                                 .east(JModel.face("side").cullface(Direction.EAST).uv(8, 0, 16, 16))
-                                .south(JModel.face("side").cullface(Direction.SOUTH).uv(0, 0, 16, 16))
+                                .south(JModel.face("side").uv(0, 0, 16, 16))
                                 .west(JModel.face("side").cullface(Direction.WEST).uv(0, 0, 8, 16))
                                 .up(JModel.face("top").cullface(Direction.UP).uv(0, 0, 16, 8))
                                 .down(JModel.face("bottom").cullface(Direction.DOWN).uv(0, 0, 16, 8))));
@@ -36,7 +39,7 @@ public class ModelUtil {
         JModel verticalSlabNorthSouthBottomModel = JModel.model().parent(namespace+":block/"+path)
                 .element(JModel.element().from(0, 0, 8).to(16, 16, 16)
                         .faces(JModel.faces()
-                                .north(JModel.face("side").cullface(Direction.NORTH).uv(0, 0, 16, 16))
+                                .north(JModel.face("side").uv(0, 0, 16, 16))
                                 .east(JModel.face("side").cullface(Direction.EAST).uv(0, 0, 8, 16))
                                 .south(JModel.face("side").cullface(Direction.SOUTH).uv(0, 0, 16, 16))
                                 .west(JModel.face("side").cullface(Direction.WEST).uv(8, 0, 16, 16))
@@ -49,7 +52,7 @@ public class ModelUtil {
                                 .north(JModel.face("side").cullface(Direction.NORTH).uv(0, 0, 8, 16))
                                 .east(JModel.face("side").cullface(Direction.EAST).uv(0, 0, 16, 16))
                                 .south(JModel.face("side").cullface(Direction.SOUTH).uv(8, 0, 16, 16))
-                                .west(JModel.face("side").cullface(Direction.WEST).uv(0, 0, 16, 16))
+                                .west(JModel.face("side").uv(0, 0, 16, 16))
                                 .up(JModel.face("top").cullface(Direction.UP).uv(8, 0, 16, 16))
                                 .down(JModel.face("bottom").cullface(Direction.DOWN).uv(8, 0, 16, 16))));
 
@@ -57,7 +60,7 @@ public class ModelUtil {
                 .element(JModel.element().from(0, 0, 0).to(8, 16, 16)
                         .faces(JModel.faces()
                                 .north(JModel.face("side").cullface(Direction.NORTH).uv(8, 0, 16, 16))
-                                .east(JModel.face("side").cullface(Direction.EAST).uv(0, 0, 16, 16))
+                                .east(JModel.face("side").uv(0, 0, 16, 16))
                                 .south(JModel.face("side").cullface(Direction.SOUTH).uv(0, 0, 8, 16))
                                 .west(JModel.face("side").cullface(Direction.WEST).uv(0, 0, 16, 16))
                                 .up(JModel.face("top").cullface(Direction.UP).uv(0, 0, 8, 16))
