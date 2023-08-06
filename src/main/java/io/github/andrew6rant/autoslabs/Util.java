@@ -40,53 +40,18 @@ public class Util {
         VERTICAL_EAST_WEST_TOP_SHAPE = Block.createCuboidShape(8.0, 0.0, 0.0, 16.0, 16.0, 16.0);
     }
 
-    /**
-     * Gets the camera offset from a position
-     *
-     * @param camera Camera position
-     * @param pos    Position to get difference
-     * @return Difference
-     */
-    public static Vec3d getCameraOffset(Vec3d camera, BlockPos pos, Direction side) {
-        BlockState state = MinecraftClient.getInstance().world.getBlockState(pos);
-        double xDif = (double) pos.getX() - camera.x;
-        double yDif = (double) pos.getY() - camera.y;
-        double zDif = (double) pos.getZ() - camera.z;
-        if (state.getBlock() instanceof SlabBlock) {
-            SlabType slabType = state.get(SlabBlock.TYPE);
-            VerticalType verticalType = state.get(VERTICAL_TYPE);
-            switch (side) {
-                case UP -> {
-                    if ((slabType == SlabType.BOTTOM) && (verticalType == VerticalType.FALSE)) {
-                        yDif -= 0.5d;
-                    }
-                }
-                case DOWN -> {
-                    if ((slabType == SlabType.TOP) && (verticalType == VerticalType.FALSE)) {
-                        yDif += 0.5d;
-                    }
-                }
-                case NORTH -> {
-                    if ((verticalType == VerticalType.NORTH_SOUTH) && (slabType == SlabType.BOTTOM)) {
-                        zDif += 0.5d;
-                    }
-                }
-                case SOUTH -> {
-                    if ((verticalType == VerticalType.NORTH_SOUTH) && (slabType == SlabType.TOP)) {
-                        zDif -= 0.5d;
-                    }
-                }
-                case WEST -> {
-                    if ((verticalType == VerticalType.EAST_WEST) && (slabType == SlabType.TOP)) {
-                        xDif += 0.5d;
-                    }
-                }
-                case EAST -> {
-                    if ((verticalType == VerticalType.EAST_WEST) && (slabType == SlabType.BOTTOM)) {
-                        xDif -= 0.5d;
-                    }
-                }
-            }
+    public static Vec3d getCameraOffset(Vec3d camDif, VoxelShape shape, Direction side) {
+        Direction.Axis axis = side.getAxis();
+        double xDif = camDif.x;
+        double yDif = camDif.y;
+        double zDif = camDif.z;
+        switch (side) {
+            case UP -> yDif = camDif.y + (-1 + shape.getMax(axis));
+            case DOWN -> yDif = camDif.y + shape.getMin(axis);
+            case NORTH -> zDif = camDif.z + shape.getMin(axis);
+            case SOUTH -> zDif = camDif.z + (-1 + shape.getMax(axis));
+            case EAST -> xDif = camDif.x + (-1 + shape.getMax(axis));
+            case WEST -> xDif = camDif.x + shape.getMin(axis);
         }
         return new Vec3d(xDif, yDif, zDif);
     }
