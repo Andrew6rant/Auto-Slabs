@@ -7,7 +7,7 @@ public class ConfigEntrypoint implements ModMenuApi {
 
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return parent -> ClientConfig.getScreen(parent,"auto_slabs");
+        return parent -> ServerConfig.getScreen(parent,"auto_slabs");
     }
 
 }

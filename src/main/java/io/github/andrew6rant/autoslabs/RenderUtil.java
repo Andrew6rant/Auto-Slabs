@@ -1,6 +1,5 @@
 package io.github.andrew6rant.autoslabs;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SlabBlock;
@@ -26,31 +25,17 @@ public class RenderUtil {
     public static void renderOverlay(MatrixStack matrices, VertexConsumer vertexConsumer, Vec3d camDif1, BlockState state, VoxelShape shape, HitResult hitResult) {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (Block.getBlockFromItem(player.getStackInHand(player.getActiveHand()).getItem()) instanceof SlabBlock || (Block.getBlockFromItem(player.getOffHandStack().getItem()) instanceof SlabBlock && player.getMainHandStack().isEmpty())) {
-
             if (hitResult.getType() == HitResult.Type.BLOCK) {
 
                 BlockHitResult result = (BlockHitResult) hitResult;
                 HitPart part = getHitPart(result);
-
                 Vec3d camDif = getCameraOffset(camDif1, shape, result.getSide());
-                //Vec3d camDif = getCameraOffset(camera.getPos(), result.getBlockPos(), result.getSide());
 
-                //RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
-                // default Minecraft line width
-                //RenderSystem.lineWidth(Math.max(2.5f, (float)MinecraftClient.getInstance().getWindow().getFramebufferWidth() / 1920.0f * 2.5f));
-                //RenderSystem.disableCull();
-
-                //matrices.push();
-                //BlockState state = MinecraftClient.getInstance().world.getBlockState(result.getBlockPos());
                 if (state.getBlock() instanceof SlabBlock) {
                     renderOverlayToDirection(state, result.getSide(), matrices, vertexConsumer, camDif, part);
                 } else {
                     renderOverlayToDirection(null, result.getSide(), matrices, vertexConsumer, camDif, part);
                 }
-
-                //matrices.pop();
-                //RenderSystem.enableDepthTest();
-                //RenderSystem.enableCull();
             }
         }
     }
@@ -344,7 +329,6 @@ public class RenderUtil {
     }
 
     private static void drawDefaultSquare(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vec3d camDif) {
-        //System.out.println("defaultSquare");
         drawLine(entry, vertexConsumer, vecStartCorner, vecEndCorner, camDif);
         drawLine(entry, vertexConsumer, vecStartCorner, vecCenterStartCorner, camDif);
         drawLine(entry, vertexConsumer, vecEndCorner, vecCenterEndCorner, camDif);

@@ -6,14 +6,11 @@ import net.devtech.arrp.json.blockstate.JVariant;
 import net.devtech.arrp.json.models.JModel;
 import net.minecraft.block.Block;
 import net.minecraft.registry.Registries;
-import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
-import virtuoel.statement.api.StateRefresher;
 
 public class ModelUtil {
     public static void setup(RuntimeResourcePack AUTO_SLABS_RESOURCES, Block block) {
-        StateRefresher.INSTANCE.addBlockProperty(block, EnumProperty.of("vertical_type", VerticalType.class), VerticalType.FALSE);
         Identifier id = Registries.BLOCK.getId(block);
         String namespace = id.getNamespace();
         String path = id.getPath();

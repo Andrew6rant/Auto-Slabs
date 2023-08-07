@@ -25,11 +25,6 @@ import static io.github.andrew6rant.autoslabs.Util.getCameraOffset;
 @Mixin(WorldRenderer.class)
 public class WorldRendererMixin {
 
-    /*@Inject(method = "render", at = @At("TAIL"))
-    private void autoslabs$drawBlockOutline(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f positionMatrix, CallbackInfo ci) {
-        RenderUtil.renderOverlay(matrices, camera);
-    }*/
-
     @Shadow @Final private MinecraftClient client;
 
     @Shadow @Nullable private ClientWorld world;
