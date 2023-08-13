@@ -3,13 +3,12 @@
 	"id": "autoslabs",
 	"version": "${version}",
 	"name": "Auto Slabs",
-	"description": "Automatically Generate vertical slabs for every instance of SlabBlock",
+	"description": "Automatically generate vertical slabs states for every instance of SlabBlock, without adding a single new block",
 	"authors": [
 		"Andrew6rant (Andrew Grant)"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/Andrew6rant/Auto-Slabs"
 	},
 	"license": "MIT",
 	"icon": "assets/autoslabs/icon.png",
@@ -32,10 +31,6 @@
 		"fabricloader": ">=0.14.12",
 		"minecraft": ">=1.20",
 		"java": ">=17",
-		"fabric-api": "*",
-		"statement": ">=4.2.5"
-	},
-	"suggests": {
-		"another-mod": "*"
+		"fabric-api": "*"
 	}
 }

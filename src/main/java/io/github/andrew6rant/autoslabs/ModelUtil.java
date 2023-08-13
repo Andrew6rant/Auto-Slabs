@@ -14,15 +14,13 @@ public class ModelUtil {
         Identifier id = Registries.BLOCK.getId(block);
         String namespace = id.getNamespace();
         String path = id.getPath();
+
         Identifier vertical_north_south_top_slab = new Identifier(namespace, "block/"+path + "_vertical_north_south_top");
         Identifier vertical_north_south_bottom_slab = new Identifier(namespace, "block/"+path + "_vertical_north_south_bottom");
         Identifier vertical_east_west_top_slab = new Identifier(namespace, "block/"+path + "_vertical_east_west_top");
         Identifier vertical_east_west_bottom_slab = new Identifier(namespace, "block/"+path + "_vertical_east_west_bottom");
 
         // Yes, I know these models are incredibly inefficient, but I need to parent them this way for the best mod compatibility.
-
-        // Disable the cull face for the vertical slabs on the to be half empty side.
-        // Or sodium will trust you and think the face is cullable
         JModel verticalSlabNorthSouthTopModel = JModel.model().parent(namespace+":block/"+path)
                 .element(JModel.element().from(0, 0, 0).to(16, 16, 8)
                         .faces(JModel.faces()

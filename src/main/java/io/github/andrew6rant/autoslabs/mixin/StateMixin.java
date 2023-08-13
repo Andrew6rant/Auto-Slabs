@@ -20,6 +20,7 @@ public class StateMixin<O, S> implements StatementStateExtensions<S> {
     @Shadow @Final @Mutable protected O owner; // cachedFallbacks and owner are modified in Statement API's StateMixin
     @Unique final Map<Property<?>, Comparable<?>> cachedFallbacks = new HashMap<>();
 
+    // This is the same as Statement API's StateMixin, except that I wrap the logger call with my config option.
     @Inject(method = "get", cancellable = true, at = @At(value = "INVOKE", target = "Ljava/lang/IllegalArgumentException;<init>(Ljava/lang/String;)V", shift = At.Shift.BEFORE))
     private <T extends Comparable<T>> void autoslabs$onGet(Property<T> property, CallbackInfoReturnable<T> info) {
         final String ownerString = this.owner.toString();

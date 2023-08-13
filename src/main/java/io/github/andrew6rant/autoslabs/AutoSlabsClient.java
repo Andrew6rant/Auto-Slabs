@@ -9,10 +9,22 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class AutoSlabsClient implements ClientModInitializer {
-	final ModContainer container = FabricLoader.getInstance().getModContainer("autoslabs").get();
+	public static final ModContainer container = FabricLoader.getInstance().getModContainer("autoslabs").get();
 
 	@Override
 	public void onInitializeClient() {
-		ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("autoslabs", "distinct_slabs"), container, Text.literal("Distinct Slabs (Built-In)"), ResourcePackActivationType.DEFAULT_ENABLED);
+		ResourceManagerHelper.registerBuiltinResourcePack(
+			new Identifier("autoslabs", "distinct_slabs"),
+			AutoSlabsClient.container,
+			Text.literal("Distinct Slabs (Built-In)"),
+			ResourcePackActivationType.DEFAULT_ENABLED);
+		//System.out.println("YOOOOOOOOOOOOOOO ADDING");
+		/*ResourceManagerHelper.registerBuiltinResourcePack(
+			new Identifier("autoslabs", "distinct_slabs"),
+			container,
+			Text.literal("Distinct Slabs (Built-In)"),
+			ResourcePackActivationType.DEFAULT_ENABLED);*/
+		//System.out.println("YOOOOOOOOOOOOOOO FINISHED");
+
 	}
 }

@@ -19,9 +19,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 // https://github.com/Oliver-makes-code/autoslab/blob/1.19/src/main/java/olivermakesco/de/autoslab/mixin/Mixin_ClientPlayerInteractionManager.java
 @Mixin(ClientPlayerInteractionManager.class)
 public class ClientPlayerInteractionManagerMixin {
-    @Shadow
-    @Final
-    private MinecraftClient client;
+    @Shadow @Final private MinecraftClient client;
 
     @Redirect(method = "breakBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;I)Z"))
     private boolean autoslabs$tryBreakSlab(World instance, BlockPos pos, BlockState state, int flags) {
