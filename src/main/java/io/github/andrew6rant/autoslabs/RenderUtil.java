@@ -47,11 +47,9 @@ public class RenderUtil {
         float b = 0;
         float a = 0.4f;
 
-        //Vec3d camDif = getCameraOffset(camera.getPos(), result.getBlockPos(), result.getSide());
-
         Vector3f startRaw = new Vector3f((float) (start.x + camDif.x), (float) (start.y + camDif.y), (float) (start.z + camDif.z));
         Vector3f endRaw = new Vector3f((float) (end.x + camDif.x), (float) (end.y + camDif.y), (float) (end.z + camDif.z));
-        //System.out.println("drawLine");
+
         vertexConsumer.vertex(entry.getPositionMatrix(), startRaw.x, startRaw.y, startRaw.z)
                 .color(r, g, b, a).normal(entry.getNormalMatrix(), normal.x, normal.y, normal.z).next();
 
@@ -159,16 +157,11 @@ public class RenderUtil {
             slabType = state.get(SlabBlock.TYPE);
             verticalType = state.get(VERTICAL_TYPE);
         }
-        
-        //Tessellator tessellator = Tessellator.getInstance();
-        //BufferBuilder buffer = tessellator.getBuffer();
-        //buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
         MatrixStack.Entry entry = matrixStack.peek();
 
         // I have no idea why, but this code only works when
         // in an if chain and not a switch statement
         if (part == HitPart.CENTER) {
-            //System.out.println("center");
             drawCenterLines(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, camDif, slabType, verticalType, side);
         }
         else if (part == HitPart.BOTTOM) {
@@ -183,7 +176,6 @@ public class RenderUtil {
         else if (part == HitPart.RIGHT) {
             drawLeftRightLines(entry, vertexConsumer, vecBottomRight, vecTopRight, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleRight, slabType, verticalType, side, camDif);
         }
-        //tessellator.draw();
     }
 
     private static void drawLeftRightLines(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vector3f vecCenterMiddleCorner, SlabType slabType, VerticalType verticalType, Direction side, Vec3d camDif) {
@@ -334,30 +326,6 @@ public class RenderUtil {
         drawLine(entry, vertexConsumer, vecEndCorner, vecCenterEndCorner, camDif);
         drawLine(entry, vertexConsumer, vecCenterStartCorner, vecCenterEndCorner, camDif);
     }
-
-    public static void drawQuad(Vector3f pos1, Vector3f pos2, Vector3f pos3, Vector3f pos4, Vec3d camDif, MatrixStack matrixStack) {
-/*
-        Vector3f pos1Raw = new Vector3f((float) (pos1.x + camDif.x), (float) (pos1.y + camDif.y), (float) (pos1.z + camDif.z));
-        Vector3f pos2Raw = new Vector3f((float) (pos2.x + camDif.x), (float) (pos2.y + camDif.y), (float) (pos2.z + camDif.z));
-        Vector3f pos3Raw = new Vector3f((float) (pos3.x + camDif.x), (float) (pos3.y + camDif.y), (float) (pos3.z + camDif.z));
-        Vector3f pos4Raw = new Vector3f((float) (pos4.x + camDif.x), (float) (pos4.y + camDif.y), (float) (pos4.z + camDif.z));
-
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
-        Matrix4f position = matrixStack.peek().getPositionMatrix();
-
-        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-
-        buffer.vertex(position, pos1Raw.x, pos1Raw.y, pos1Raw.z).color(0f, 0f, 0f, 0.15f).next();
-        buffer.vertex(position, pos2Raw.x, pos2Raw.y, pos2Raw.z).color(0f, 0f, 0f, 0.15f).next();
-        buffer.vertex(position, pos3Raw.x, pos3Raw.y, pos3Raw.z).color(0f, 0f, 0f, 0.15f).next();
-        buffer.vertex(position, pos4Raw.x, pos4Raw.y, pos4Raw.z).color(0f, 0f, 0f, 0.15f).next();
-
-        tessellator.draw();
-        */
-    }
-
 
 }
 

@@ -20,9 +20,6 @@ public class ModelUtil {
         Identifier vertical_east_west_bottom_slab = new Identifier(namespace, "block/"+path + "_vertical_east_west_bottom");
 
         // Yes, I know these models are incredibly inefficient, but I need to parent them this way for the best mod compatibility.
-
-        // Disable the cull face for the vertical slabs on the to be half empty side.
-        // Or sodium will trust you and think the face is cullable
         JModel verticalSlabNorthSouthTopModel = JModel.model().parent(namespace+":block/"+path)
                 .element(JModel.element().from(0, 0, 0).to(16, 16, 8)
                         .faces(JModel.faces()

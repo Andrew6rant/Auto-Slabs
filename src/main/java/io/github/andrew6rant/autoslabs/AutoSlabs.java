@@ -23,6 +23,7 @@ public class AutoSlabs implements ModInitializer {
 			}
 		}
 		StateRefresher.INSTANCE.reorderBlockStates();
+		// custom ARRP entrypoint that is only available in my fork of ARRP
 		RRPCallback.BETWEEN_VANILLA_AND_MODS.register(a -> a.add(AUTO_SLABS_RESOURCES));
 		//AUTO_SLABS_RESOURCES.dump();
 	}

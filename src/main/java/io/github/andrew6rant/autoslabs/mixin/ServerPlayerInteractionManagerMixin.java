@@ -18,12 +18,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 // https://github.com/Oliver-makes-code/autoslab/blob/1.19/src/main/java/olivermakesco/de/autoslab/mixin/Mixin_ServerPlayerInteractionManager.java
 @Mixin(ServerPlayerInteractionManager.class)
 public class ServerPlayerInteractionManagerMixin {
-    @Shadow
-    @Final
-    protected ServerPlayerEntity player;
+    @Shadow @Final protected ServerPlayerEntity player;
 
-    @Shadow
-    protected ServerWorld world;
+    @Shadow protected ServerWorld world;
 
     @Redirect(method = "tryBreakBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;removeBlock(Lnet/minecraft/util/math/BlockPos;Z)Z"))
     private boolean autoslabs$tryBreakSlab(ServerWorld instance, BlockPos pos, boolean b) {
