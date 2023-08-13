@@ -20,9 +20,9 @@ repositories {
     maven {
         url = "https://jitpack.io"
     }
-    maven {
-		url = uri("https://ueaj.dev/maven")
-    }
+    //maven {
+	//	url = uri("https://ueaj.dev/maven")
+    //}
 	maven {
 		url "https://maven.terraformersmc.com/releases/"
 	}
@@ -44,7 +44,7 @@ dependencies {
     modApi("com.github.Virtuoel:Statement:${project.statement_version}", {
         exclude group: "net.fabricmc.fabric-api"
     })
-    modImplementation("net.devtech:arrp:${project.arrp_version}")
+    modImplementation("com.github.Andrew6rant:ARRP:${project.arrp_version}")
 
 	modImplementation ("com.terraformersmc:modmenu:${project.modmenu_version}") {
 		exclude module: "fabric-api"

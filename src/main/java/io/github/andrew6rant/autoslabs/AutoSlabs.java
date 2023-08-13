@@ -23,7 +23,7 @@ public class AutoSlabs implements ModInitializer {
 			}
 		}
 		StateRefresher.INSTANCE.reorderBlockStates();
-		RRPCallback.BEFORE_USER.register(a -> a.add(AUTO_SLABS_RESOURCES));
+		RRPCallback.BETWEEN_VANILLA_AND_MODS.register(a -> a.add(AUTO_SLABS_RESOURCES));
 		//AUTO_SLABS_RESOURCES.dump();
 	}
 }
