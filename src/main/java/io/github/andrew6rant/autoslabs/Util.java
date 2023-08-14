@@ -1,5 +1,6 @@
 package io.github.andrew6rant.autoslabs;
 
+import net.devtech.arrp.api.RuntimeResourcePack;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SlabBlock;
@@ -14,8 +15,11 @@ import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import org.joml.Vector3f;
+import virtuoel.statement.api.StateRefresher;
 
 import java.util.Optional;
+
+import static io.github.andrew6rant.autoslabs.AutoSlabs.AUTO_SLABS_RESOURCES;
 
 // massive thanks to Schauweg for some of this code
 public class Util {
@@ -38,6 +42,13 @@ public class Util {
         VERTICAL_NORTH_SOUTH_TOP_SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 16.0, 8.0);
         VERTICAL_EAST_WEST_BOTTOM_SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 8.0, 16.0, 16.0);
         VERTICAL_EAST_WEST_TOP_SHAPE = Block.createCuboidShape(8.0, 0.0, 0.0, 16.0, 16.0, 16.0);
+    }
+
+    public static void registerSlab(Block block) {
+        if (block instanceof SlabBlock slabBlock) {
+            StateRefresher.INSTANCE.addBlockProperty(slabBlock, VERTICAL_TYPE, VerticalType.FALSE);
+            ModelUtil.setup(AUTO_SLABS_RESOURCES, slabBlock);
+        }
     }
 
     public static Vec3d getCameraOffset(Vec3d camDif, VoxelShape shape, Direction side) {
