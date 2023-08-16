@@ -69,7 +69,8 @@ public class SlabBlockMixin extends Block implements Waterloggable {
 	@Override
 	public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack stack) {
 		if (player.isSneaking()) {
-			super.afterBreak(world, player, pos, state.with(TYPE, DOUBLE), blockEntity, stack);
+			//Should ensure that if the player mines a single slab, it drops the correct amount
+			super.afterBreak(world, player, pos, state.with(TYPE, state.get(SlabBlock.TYPE)), blockEntity, stack);
 		} else {
 			super.afterBreak(world, player, pos, state.with(TYPE, TOP), blockEntity, stack);
 		}
