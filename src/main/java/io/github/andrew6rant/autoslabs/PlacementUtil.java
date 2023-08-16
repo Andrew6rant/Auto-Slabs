@@ -1,6 +1,8 @@
 package io.github.andrew6rant.autoslabs;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.PaneBlock;
+import net.minecraft.block.SlabBlock;
 import net.minecraft.block.enums.SlabType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
@@ -8,6 +10,8 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -18,13 +22,33 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.RaycastContext;
 
 import static io.github.andrew6rant.autoslabs.Util.*;
+import static io.github.andrew6rant.autoslabs.VerticalType.*;
+import static net.minecraft.block.PaneBlock.cannotConnect;
 import static net.minecraft.block.SlabBlock.TYPE;
 import static net.minecraft.block.SlabBlock.WATERLOGGED;
 import static net.minecraft.block.enums.SlabType.TOP;
 
 public class PlacementUtil {
 
-    public static VoxelShape getDynamicOutlineShape(VerticalType verticalType, Direction side, BlockHitResult cast) {
+    public static boolean calcPaneCanConnectToVerticalSlab(Direction paneDirection, BlockState offsetState, boolean sideSolidFullSquare) {
+        System.out.println("calcPaneCanConnectToVerticalSlab called");
+        if (sideSolidFullSquare && !cannotConnect(offsetState)) {
+            return true;
+        }
+        if (offsetState.getBlock() instanceof SlabBlock) {
+            switch (paneDirection) {
+                case NORTH, SOUTH -> {
+                    return offsetState.get(VERTICAL_TYPE) == EAST_WEST;
+                }
+                case EAST, WEST -> {
+                    return offsetState.get(VERTICAL_TYPE) == NORTH_SOUTH;
+                }
+            }
+        }
+        return offsetState.getBlock() instanceof PaneBlock || offsetState.isIn(BlockTags.WALLS);
+    }
+
+        public static VoxelShape getDynamicOutlineShape(VerticalType verticalType, Direction side, BlockHitResult cast) {
         return switch (verticalType) {
             case FALSE -> {
                 switch (side) {
@@ -113,16 +137,16 @@ public class PlacementUtil {
             case NORTH_SOUTH -> {
                 switch (side) {
                     case NORTH -> {
-                        yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(TYPE, SlabType.TOP);
+                        yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, NORTH_SOUTH).with(TYPE, SlabType.TOP);
                     }
                     case SOUTH -> {
-                        yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(TYPE, SlabType.BOTTOM);
+                        yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, NORTH_SOUTH).with(TYPE, SlabType.BOTTOM);
                     }
                     default -> {
                         var zPos = cast.getPos().z;
                         var zOffset = ((zPos % 1) + 1) % 1;
-                        if (zOffset > 0.5) yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(TYPE, SlabType.BOTTOM);
-                        else yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(TYPE, SlabType.TOP);
+                        if (zOffset > 0.5) yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, NORTH_SOUTH).with(TYPE, SlabType.BOTTOM);
+                        else yield state.getBlock().getDefaultState().with(VERTICAL_TYPE, NORTH_SOUTH).with(TYPE, SlabType.TOP);
                     }
                 }
             }
@@ -218,7 +242,7 @@ public class PlacementUtil {
                                     return part == HitPart.CENTER;
                                 }
                             }
-                        } else if (verticalType == VerticalType.NORTH_SOUTH) {
+                        } else if (verticalType == NORTH_SOUTH) {
                             if (slabType == SlabType.BOTTOM) {
                                 if (direction == Direction.NORTH || !topHalfZ && direction.getAxis().isVertical()) {
                                     return part == HitPart.CENTER;
@@ -279,9 +303,9 @@ public class PlacementUtil {
             if (part == HitPart.CENTER) {
                 return state.with(TYPE, SlabType.BOTTOM).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             } else if (part == HitPart.BOTTOM) {
-                return state.with(TYPE, SlabType.TOP).with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+                return state.with(TYPE, SlabType.TOP).with(VERTICAL_TYPE, NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             } else if (part == HitPart.TOP) {
-                return state.with(TYPE, SlabType.BOTTOM).with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+                return state.with(TYPE, SlabType.BOTTOM).with(VERTICAL_TYPE, NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             } else if (part == HitPart.LEFT) {
                 return state.with(TYPE, SlabType.TOP).with(VERTICAL_TYPE, VerticalType.EAST_WEST).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             } else if (part == HitPart.RIGHT) {
@@ -299,9 +323,9 @@ public class PlacementUtil {
             if (part == HitPart.CENTER) {
                 return state.with(TYPE, SlabType.TOP).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             } else if (part == HitPart.BOTTOM) {
-                return state.with(TYPE, SlabType.TOP).with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+                return state.with(TYPE, SlabType.TOP).with(VERTICAL_TYPE, NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             } else if (part == HitPart.TOP) {
-                return state.with(TYPE, SlabType.BOTTOM).with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+                return state.with(TYPE, SlabType.BOTTOM).with(VERTICAL_TYPE, NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             } else if (part == HitPart.LEFT) {
                 return state.with(TYPE, SlabType.BOTTOM).with(VERTICAL_TYPE, VerticalType.EAST_WEST).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             } else if (part == HitPart.RIGHT) {
@@ -317,7 +341,7 @@ public class PlacementUtil {
                 return blockState.with(TYPE, SlabType.DOUBLE).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             }
             if (part == HitPart.CENTER) {
-                return state.with(TYPE, SlabType.BOTTOM).with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+                return state.with(TYPE, SlabType.BOTTOM).with(VERTICAL_TYPE, NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             } else if (part == HitPart.BOTTOM) {
                 return state.with(TYPE, SlabType.BOTTOM).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             } else if (part == HitPart.TOP) {
@@ -337,7 +361,7 @@ public class PlacementUtil {
                 return blockState.with(TYPE, SlabType.DOUBLE).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             }
             if (part == HitPart.CENTER) {
-                return state.with(TYPE, SlabType.TOP).with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+                return state.with(TYPE, SlabType.TOP).with(VERTICAL_TYPE, NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             } else if (part == HitPart.BOTTOM) {
                 return state.with(TYPE, SlabType.BOTTOM).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             } else if (part == HitPart.TOP) {
@@ -363,9 +387,9 @@ public class PlacementUtil {
             } else if (part == HitPart.TOP) {
                 return state.with(TYPE, SlabType.TOP).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             } else if (part == HitPart.LEFT) {
-                return state.with(TYPE, SlabType.BOTTOM).with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+                return state.with(TYPE, SlabType.BOTTOM).with(VERTICAL_TYPE, NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             } else if (part == HitPart.RIGHT) {
-                return state.with(TYPE, SlabType.TOP).with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+                return state.with(TYPE, SlabType.TOP).with(VERTICAL_TYPE, NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             }
         }
         return null;
@@ -383,9 +407,9 @@ public class PlacementUtil {
             } else if (part == HitPart.TOP) {
                 return state.with(TYPE, SlabType.TOP).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             } else if (part == HitPart.LEFT) {
-                return state.with(TYPE, SlabType.TOP).with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+                return state.with(TYPE, SlabType.TOP).with(VERTICAL_TYPE, NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             } else if (part == HitPart.RIGHT) {
-                return state.with(TYPE, SlabType.BOTTOM).with(VERTICAL_TYPE, VerticalType.NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+                return state.with(TYPE, SlabType.BOTTOM).with(VERTICAL_TYPE, NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             }
         }
         return null;
