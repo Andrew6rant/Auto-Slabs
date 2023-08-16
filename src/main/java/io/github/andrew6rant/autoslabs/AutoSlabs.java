@@ -8,6 +8,8 @@ import net.minecraft.block.Block;
 import net.minecraft.registry.Registries;
 import virtuoel.statement.api.StateRefresher;
 
+import static io.github.andrew6rant.autoslabs.config.ServerConfig.dumpResources;
+
 public class AutoSlabs implements ModInitializer {
 	public static final RuntimeResourcePack AUTO_SLABS_RESOURCES = RuntimeResourcePack.create("autoslabs:resources", 15);
 
@@ -26,6 +28,8 @@ public class AutoSlabs implements ModInitializer {
 
 		// custom ARRP entrypoint that is only available in my fork of ARRP
 		RRPCallback.BETWEEN_MODS_AND_USER.register(a -> a.add(AUTO_SLABS_RESOURCES));
-		//AUTO_SLABS_RESOURCES.dump();
+		if (dumpResources) {
+			AUTO_SLABS_RESOURCES.dump();
+		}
 	}
 }

@@ -1,4 +1,6 @@
 {
   "auto_slabs.midnightconfig.title": "AutoSlabs",
-  "auto_slabs.midnightconfig.suppressStatementAPILogger": "Suppress Statement API's Logger?"
+  "auto_slabs.midnightconfig.suppressStatementAPILogger": "Suppress Statement API's Logger?",
+  "auto_slabs.midnightconfig.dumpResources": "Dump generated resources on boot?"
+
 }
