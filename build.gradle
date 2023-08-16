@@ -44,7 +44,7 @@ dependencies {
     include modApi("com.github.Virtuoel:Statement:${project.statement_version}", {
         exclude group: "net.fabricmc.fabric-api"
     })
-    include modImplementation("com.github.Andrew6rant:ARRP:${project.arrp_version}")
+    include modImplementation("net.devtech:arrp:${project.arrp_version}")
 
 	modImplementation ("com.terraformersmc:modmenu:${project.modmenu_version}") {
 		exclude module: "fabric-api"
