@@ -11,9 +11,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -31,7 +29,6 @@ import static net.minecraft.block.enums.SlabType.TOP;
 public class PlacementUtil {
 
     public static boolean calcPaneCanConnectToVerticalSlab(Direction paneDirection, BlockState offsetState, boolean sideSolidFullSquare) {
-        System.out.println("calcPaneCanConnectToVerticalSlab called");
         if (sideSolidFullSquare && !cannotConnect(offsetState)) {
             return true;
         }
@@ -48,7 +45,7 @@ public class PlacementUtil {
         return offsetState.getBlock() instanceof PaneBlock || offsetState.isIn(BlockTags.WALLS);
     }
 
-        public static VoxelShape getDynamicOutlineShape(VerticalType verticalType, Direction side, BlockHitResult cast) {
+    public static VoxelShape getDynamicOutlineShape(VerticalType verticalType, Direction side, BlockHitResult cast) {
         return switch (verticalType) {
             case FALSE -> {
                 switch (side) {
