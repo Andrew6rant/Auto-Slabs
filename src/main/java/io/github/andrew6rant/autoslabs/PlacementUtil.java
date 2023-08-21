@@ -11,6 +11,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -169,7 +170,7 @@ public class PlacementUtil {
     public static BlockHitResult calcRaycast(Entity entity) {
         Vec3d vec3d = entity.getCameraPosVec(0);
         Vec3d vec3d2 = entity.getRotationVec(0);
-        Vec3d vec3d3 = vec3d.add(vec3d2.x * 5, vec3d2.y * 5, vec3d2.z * 5);
+        Vec3d vec3d3 = vec3d.add(vec3d2.x * 5d, vec3d2.y * 5d, vec3d2.z * 5d);
         return entity.getWorld().raycast(new RaycastContext(vec3d, vec3d3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity));
     }
 
@@ -271,6 +272,7 @@ public class PlacementUtil {
     }
 
     public static BlockState calcPlacementState(ItemPlacementContext ctx, BlockState state) {
+        if (!(ctx.getWorld() instanceof ServerWorld)) return null;
         BlockPos blockPos = ctx.getBlockPos();
         BlockState blockState = ctx.getWorld().getBlockState(blockPos);
         Direction ctxSide = ctx.getSide();
