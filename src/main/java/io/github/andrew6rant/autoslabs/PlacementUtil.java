@@ -294,7 +294,7 @@ public class PlacementUtil {
     public static BlockState calcUpPlacement(BlockState blockState, BlockState state, HitPart part, FluidState fluidState) {
         if (part != null) {
             if (blockState.isOf(state.getBlock())) {
-                return blockState.with(TYPE, SlabType.DOUBLE).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+                return blockState.with(TYPE, SlabType.DOUBLE).with(WATERLOGGED, false);
             }
             if (part == HitPart.CENTER) {
                 return state.with(TYPE, SlabType.BOTTOM).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
@@ -314,7 +314,7 @@ public class PlacementUtil {
     public static BlockState calcDownPlacement(BlockState blockState, BlockState state, HitPart part, FluidState fluidState) {
         if (part != null) {
             if (blockState.isOf(state.getBlock())) {
-                return blockState.with(TYPE, SlabType.DOUBLE).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+                return blockState.with(TYPE, SlabType.DOUBLE).with(WATERLOGGED, false);
             }
             if (part == HitPart.CENTER) {
                 return state.with(TYPE, SlabType.TOP).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
@@ -334,7 +334,7 @@ public class PlacementUtil {
     public static BlockState calcNorthPlacement(BlockState blockState, BlockState state, HitPart part, FluidState fluidState) {
         if (part != null) {
             if (blockState.isOf(state.getBlock())) {
-                return blockState.with(TYPE, SlabType.DOUBLE).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+                return blockState.with(TYPE, SlabType.DOUBLE).with(WATERLOGGED, false);
             }
             if (part == HitPart.CENTER) {
                 return state.with(TYPE, SlabType.BOTTOM).with(VERTICAL_TYPE, NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
@@ -354,7 +354,7 @@ public class PlacementUtil {
     public static BlockState calcSouthPlacement(BlockState blockState, BlockState state, HitPart part, FluidState fluidState) {
         if (part != null) {
             if (blockState.isOf(state.getBlock())) {
-                return blockState.with(TYPE, SlabType.DOUBLE).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+                return blockState.with(TYPE, SlabType.DOUBLE).with(WATERLOGGED, false);
             }
             if (part == HitPart.CENTER) {
                 return state.with(TYPE, SlabType.TOP).with(VERTICAL_TYPE, NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
@@ -374,7 +374,7 @@ public class PlacementUtil {
     public static BlockState calcEastPlacement(BlockState blockState, BlockState state, HitPart part, FluidState fluidState) {
         if (part != null) {
             if (blockState.isOf(state.getBlock())) {
-                return blockState.with(TYPE, SlabType.DOUBLE).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+                return blockState.with(TYPE, SlabType.DOUBLE).with(WATERLOGGED, false);
             }
             if (part == HitPart.CENTER) {
                 return state.with(TYPE, SlabType.BOTTOM).with(VERTICAL_TYPE, VerticalType.EAST_WEST).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
@@ -394,7 +394,7 @@ public class PlacementUtil {
     public static BlockState calcWestPlacement(BlockState blockState, BlockState state, HitPart part, FluidState fluidState) {
         if (part != null) {
             if (blockState.isOf(state.getBlock())) {
-                return blockState.with(TYPE, SlabType.DOUBLE).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+                return blockState.with(TYPE, SlabType.DOUBLE).with(WATERLOGGED, false);
             }
             if (part == HitPart.CENTER) {
                 return state.with(TYPE, SlabType.TOP).with(VERTICAL_TYPE, VerticalType.EAST_WEST).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
