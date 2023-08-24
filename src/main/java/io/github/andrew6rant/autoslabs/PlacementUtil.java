@@ -272,7 +272,7 @@ public class PlacementUtil {
     }
 
     public static BlockState calcPlacementState(ItemPlacementContext ctx, BlockState state) {
-        if (!(ctx.getWorld() instanceof ServerWorld)) return null;
+        //if (!(ctx.getWorld() instanceof ServerWorld)) return null;
         BlockPos blockPos = ctx.getBlockPos();
         BlockState blockState = ctx.getWorld().getBlockState(blockPos);
         Direction ctxSide = ctx.getSide();
