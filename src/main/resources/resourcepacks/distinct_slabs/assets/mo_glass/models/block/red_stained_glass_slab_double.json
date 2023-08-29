@@ -1,0 +1,8 @@
+{
+  "parent": "autoslabs:block/slab_double_template",
+  "textures": {
+    "bottom": "minecraft:block/red_stained_glass",
+    "side": "mo_glass:block/red_stained_glass_slab_double",
+    "top": "minecraft:block/red_stained_glass"
+  }
+}

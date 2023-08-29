@@ -1,0 +1,9 @@
+{
+  "parent": "autoslabs:block/slab_vertical_north_south_double_template",
+  "textures": {
+    "bottom": "mo_glass:block/pink_stained_glass_slab_double",
+    "side": "minecraft:block/pink_stained_glass",
+    "side_vertical": "mo_glass:block/pink_stained_glass_slab_vertical",
+    "top": "mo_glass:block/pink_stained_glass_slab_double"
+  }
+}
