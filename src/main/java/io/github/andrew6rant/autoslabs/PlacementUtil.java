@@ -1,6 +1,7 @@
 package io.github.andrew6rant.autoslabs;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.PaneBlock;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.enums.SlabType;
@@ -22,6 +23,7 @@ import net.minecraft.world.RaycastContext;
 
 import static io.github.andrew6rant.autoslabs.Util.*;
 import static io.github.andrew6rant.autoslabs.VerticalType.*;
+import static net.minecraft.block.LightBlock.LEVEL_15;
 import static net.minecraft.block.PaneBlock.cannotConnect;
 import static net.minecraft.block.SlabBlock.TYPE;
 import static net.minecraft.block.SlabBlock.WATERLOGGED;
@@ -272,7 +274,11 @@ public class PlacementUtil {
     }
 
     public static BlockState calcPlacementState(ItemPlacementContext ctx, BlockState state) {
-        if (!(ctx.getWorld() instanceof ServerWorld)) return null;
+        // horrendous hack to make the client think that it can place down a slab
+        // without visual desync or server-client communication
+        // (light blocks with a level of 0 are completely invisible and also have no hitbox
+        if (!(ctx.getWorld() instanceof ServerWorld)) return Blocks.LIGHT.getDefaultState().with(LEVEL_15, 0);
+
         BlockPos blockPos = ctx.getBlockPos();
         BlockState blockState = ctx.getWorld().getBlockState(blockPos);
         Direction ctxSide = ctx.getSide();
