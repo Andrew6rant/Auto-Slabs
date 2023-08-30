@@ -274,13 +274,21 @@ public class PlacementUtil {
     }
 
     public static BlockState calcPlacementState(ItemPlacementContext ctx, BlockState state) {
+        BlockPos blockPos = ctx.getBlockPos();
+        BlockState blockState = ctx.getWorld().getBlockState(blockPos);
+
         // horrendous hack to make the client think that it can place down a slab
         // without visual desync or server-client communication
         // (light blocks with a level of 0 are completely invisible and also have no hitbox
-        if (!(ctx.getWorld() instanceof ServerWorld)) return Blocks.LIGHT.getDefaultState().with(LEVEL_15, 0);
+        // If I return null, the client does not play the "block place" animation
+        if (!(ctx.getWorld() instanceof ServerWorld)) {
+            if (blockState.isOf(state.getBlock())) {
+                return blockState.with(TYPE, SlabType.DOUBLE).with(WATERLOGGED, false);
+            } else {
+                return Blocks.LIGHT.getDefaultState().with(LEVEL_15, 0);
+            }
+        }
 
-        BlockPos blockPos = ctx.getBlockPos();
-        BlockState blockState = ctx.getWorld().getBlockState(blockPos);
         Direction ctxSide = ctx.getSide();
         FluidState fluidState = ctx.getWorld().getFluidState(blockPos);
         PlayerEntity entity = ctx.getPlayer();
