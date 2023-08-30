@@ -1,0 +1,25 @@
+{
+  "variants": {
+    "type=double,vertical_type=north_south": {
+      "model": "mo_glass:block/brown_stained_glass_slab_vertical_north_south_double"
+    },
+    "type=double,vertical_type=east_west": {
+      "model": "mo_glass:block/brown_stained_glass_slab_vertical_east_west_double"
+    },
+    "type=double,vertical_type=false": {
+      "model": "mo_glass:block/brown_stained_glass_slab_double"
+    },
+    "type=bottom,vertical_type=north_south": {
+      "model": "mo_glass:block/brown_stained_glass_slab_vertical_north_south_bottom"
+    },
+    "type=top,vertical_type=north_south": {
+      "model": "mo_glass:block/brown_stained_glass_slab_vertical_north_south_top"
+    },
+    "type=top,vertical_type=east_west": {
+      "model": "mo_glass:block/brown_stained_glass_slab_vertical_east_west_top"
+    },
+    "type=bottom,vertical_type=east_west": {
+      "model": "mo_glass:block/brown_stained_glass_slab_vertical_east_west_bottom"
+    }
+  }
+}
