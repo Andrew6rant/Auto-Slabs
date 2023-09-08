@@ -3,15 +3,19 @@ package io.github.andrew6rant.autoslabs;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.block.SlabBlock;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
@@ -20,11 +24,23 @@ public class AutoSlabsClient implements ClientModInitializer {
 	final ModContainer container = FabricLoader.getInstance().getModContainer("autoslabs").get();
 
 	public static KeyBinding SLAB_LOCK_KEYBIND = KeyBindingHelper.registerKeyBinding(
-			new KeyBinding("key.autoslabs.slablock", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_K, KeyBinding.GAMEPLAY_CATEGORY)
+			new KeyBinding("key.autoslabs.slab_lock", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_K, KeyBinding.GAMEPLAY_CATEGORY)
 	);
 
 	private static Boolean validKeyPress = true;
 	private static SlabLockEnum slabLockPosition = SlabLockEnum.DEFAULT_ALL;
+
+	private void sendKeybind(SlabLockEnum lockedPosition) {
+		PacketByteBuf buf = PacketByteBufs.create();
+		buf.writeEnumConstant(lockedPosition);
+		ClientPlayNetworking.send(new Identifier("autoslabs", "slab_lock"), buf);
+	}
+
+	private void setKeybind(SlabLockEnum lockedPosition, MinecraftClient client) {
+		slabLockPosition = slabLockPosition.loop(client);
+		sendKeybind(slabLockPosition);
+		client.player.sendMessage(Text.translatable("text.autoslabs.slab_lock."+lockedPosition.toString()), true);
+	}
 
 	@Override
 	public void onInitializeClient() {
@@ -36,40 +52,10 @@ public class AutoSlabsClient implements ClientModInitializer {
 					ItemStack heldItem = client.player.getStackInHand(client.player.getActiveHand());
 					if (heldItem != null && !heldItem.isEmpty() && heldItem.getItem() instanceof BlockItem && ((BlockItem) heldItem.getItem()).getBlock() instanceof SlabBlock) {
 						validKeyPress = false;
-
-						switch (slabLockPosition) {
-							case DEFAULT_ALL -> {
-								slabLockPosition = slabLockPosition.loop(client);
-								client.player.sendMessage(Text.translatable("text.autoslabs.slablock.DEFAULT_ALL"), true);
-							}
-							case BOTTOM_SLAB -> {
-								slabLockPosition = slabLockPosition.loop(client);
-								client.player.sendMessage(Text.translatable("text.autoslabs.slablock.BOTTOM_SLAB"), true);
-							}
-							case TOP_SLAB -> {
-								slabLockPosition = slabLockPosition.loop(client);
-								client.player.sendMessage(Text.translatable("text.autoslabs.slablock.TOP_SLAB"), true);
-							}
-							case NORTH_SLAB_VERTICAL -> {
-								slabLockPosition = slabLockPosition.loop(client);
-								client.player.sendMessage(Text.translatable("text.autoslabs.slablock.NORTH_SLAB_VERTICAL"), true);
-							}
-							case SOUTH_SLAB_VERTICAL -> {
-								slabLockPosition = slabLockPosition.loop(client);
-								client.player.sendMessage(Text.translatable("text.autoslabs.slablock.SOUTH_SLAB_VERTICAL"), true);
-							}
-							case EAST_SLAB_VERTICAL -> {
-								slabLockPosition = slabLockPosition.loop(client);
-								client.player.sendMessage(Text.translatable("text.autoslabs.slablock.EAST_SLAB_VERTICAL"), true);
-							}
-							case WEST_SLAB_VERTICAL -> {
-								slabLockPosition = slabLockPosition.loop(client);
-								client.player.sendMessage(Text.translatable("text.autoslabs.slablock.WEST_SLAB_VERTICAL"), true);
-							}
-						}
+						setKeybind(slabLockPosition, client);
 					}
 				}
-				if (!SLAB_LOCK_KEYBIND.isPressed() && !validKeyPress){
+				if (!SLAB_LOCK_KEYBIND.isPressed() && !validKeyPress) {
 					validKeyPress = true;
 				}
 			}
