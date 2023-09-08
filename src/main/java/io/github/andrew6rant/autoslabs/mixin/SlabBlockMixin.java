@@ -1,6 +1,8 @@
 package io.github.andrew6rant.autoslabs.mixin;
 
+import io.github.andrew6rant.autoslabs.AutoSlabs;
 import io.github.andrew6rant.autoslabs.PlacementUtil;
+import io.github.andrew6rant.autoslabs.SlabLockEnum;
 import io.github.andrew6rant.autoslabs.VerticalType;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -33,20 +35,26 @@ public class SlabBlockMixin extends Block implements Waterloggable {
 		super(settings);
 	}
 
-	@Override
-	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		return PlacementUtil.calcPlacementState(ctx, this.getDefaultState());
+	@Inject(at = @At("HEAD"), method = "canReplace(Lnet/minecraft/block/BlockState;Lnet/minecraft/item/ItemPlacementContext;)Z", cancellable = true)
+	private void autoslabs$canSlabReplace(BlockState state, ItemPlacementContext ctx, CallbackInfoReturnable<Boolean> cir) {
+		if (ctx.getPlayer() == null) return;
+		if (!AutoSlabs.slabLockPosition.getOrDefault(ctx.getPlayer(), SlabLockEnum.DEFAULT_ALL).equals(SlabLockEnum.VANILLA_PLACEMENT)) {
+			cir.setReturnValue(PlacementUtil.canReplace(state, ctx));
+		}
 	}
 
-	@Override
-	public boolean canReplace(BlockState state, ItemPlacementContext context) {
-		return PlacementUtil.canReplace(state, context);
+	@Inject(at = @At("HEAD"), method = "getPlacementState(Lnet/minecraft/item/ItemPlacementContext;)Lnet/minecraft/block/BlockState;", cancellable = true)
+	private void autoslabs$getSlabPlacementState(ItemPlacementContext ctx, CallbackInfoReturnable<BlockState> cir) {
+		if (ctx.getPlayer() == null) return;
+		if (!AutoSlabs.slabLockPosition.getOrDefault(ctx.getPlayer(), SlabLockEnum.DEFAULT_ALL).equals(SlabLockEnum.VANILLA_PLACEMENT)) {
+			cir.setReturnValue(PlacementUtil.calcPlacementState(ctx, this.getDefaultState()));
+		}
 	}
 
 	// Massive thanks to Oliver-makes-code for some of the code behind this mixin
 	// https://github.com/Oliver-makes-code/autoslab/blob/1.19/src/main/java/olivermakesco/de/autoslab/mixin/Mixin_SlabBlock.java
-	@Inject(at = @At("RETURN"), method = "getOutlineShape", cancellable = true)
-	private void autoslabs$getBetterOutline(BlockState state, BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir) {
+	@Inject(at = @At("RETURN"), method = "getOutlineShape(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;",cancellable = true)
+	private void autoslabs$getBetterSlabOutline(BlockState state, BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir) {
 		if (!(context instanceof EntityShapeContext entityContext)) return;
 		SlabType slabType = state.get(TYPE);
 		if (slabType != SlabType.DOUBLE) return;

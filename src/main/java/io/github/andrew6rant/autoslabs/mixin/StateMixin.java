@@ -1,6 +1,6 @@
 package io.github.andrew6rant.autoslabs.mixin;
 
-import io.github.andrew6rant.autoslabs.config.ServerConfig;
+import io.github.andrew6rant.autoslabs.config.CommonConfig;
 import net.minecraft.state.State;
 import net.minecraft.state.property.Property;
 import org.spongepowered.asm.mixin.*;
@@ -25,7 +25,7 @@ public class StateMixin<O, S> implements StatementStateExtensions<S> {
         final String ownerString = this.owner.toString();
 
         if (!getMissingOwner.equals(ownerString)) {
-            if (!ServerConfig.suppressStatementAPILogger) {
+            if (!CommonConfig.suppressStatementAPILogger) {
                 Statement.LOGGER.info("Cannot get property {} as it does not exist in {}", property, this.owner);
             }
             getMissingOwner = ownerString;
@@ -36,8 +36,8 @@ public class StateMixin<O, S> implements StatementStateExtensions<S> {
 
     static {
         // I need to initialize the config earlier than onInitialize() runs in order to suppress Statement API's logger based on a config value
-        ServerConfig.init("auto_slabs", ServerConfig.class);
-        if (ServerConfig.suppressStatementAPILogger) {
+        CommonConfig.init("auto_slabs", CommonConfig.class);
+        if (CommonConfig.suppressStatementAPILogger) {
             Statement.LOGGER.warn("Statement API's logging has been disabled by AutoSlabs!");
         } else {
             Statement.LOGGER.warn("AutoSlabs: don't worry about these errors :)");

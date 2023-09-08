@@ -9,7 +9,8 @@ public enum SlabLockEnum {
     NORTH_SLAB_VERTICAL,
     SOUTH_SLAB_VERTICAL,
     EAST_SLAB_VERTICAL,
-    WEST_SLAB_VERTICAL;
+    WEST_SLAB_VERTICAL,
+    VANILLA_PLACEMENT;
 
     public static final SlabLockEnum[] POSITION_VALUES = values();
 

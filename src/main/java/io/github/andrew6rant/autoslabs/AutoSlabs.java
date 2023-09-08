@@ -6,8 +6,6 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;
-import net.minecraft.entity.attribute.EntityAttributeInstance;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
@@ -16,7 +14,7 @@ import virtuoel.statement.api.StateRefresher;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.github.andrew6rant.autoslabs.config.ServerConfig.dumpResources;
+import static io.github.andrew6rant.autoslabs.config.CommonConfig.dumpResources;
 
 public class AutoSlabs implements ModInitializer {
 	public static final RuntimeResourcePack AUTO_SLABS_RESOURCES = RuntimeResourcePack.create("autoslabs:resources", 15);

@@ -28,7 +28,7 @@ public class AutoSlabsClient implements ClientModInitializer {
 	);
 
 	private static Boolean validKeyPress = true;
-	private static SlabLockEnum slabLockPosition = SlabLockEnum.DEFAULT_ALL;
+	public static SlabLockEnum clientSlabLockPosition = SlabLockEnum.DEFAULT_ALL;
 
 	private void sendKeybind(SlabLockEnum lockedPosition) {
 		PacketByteBuf buf = PacketByteBufs.create();
@@ -37,9 +37,9 @@ public class AutoSlabsClient implements ClientModInitializer {
 	}
 
 	private void setKeybind(MinecraftClient client) {
-		slabLockPosition = slabLockPosition.loop(client.options.sneakKey.isPressed());
-		sendKeybind(slabLockPosition);
-		client.player.sendMessage(Text.translatable("text.autoslabs.slab_lock."+slabLockPosition.toString()), true);
+		clientSlabLockPosition = clientSlabLockPosition.loop(client.options.sneakKey.isPressed());
+		sendKeybind(clientSlabLockPosition);
+		client.player.sendMessage(Text.translatable("text.autoslabs.slab_lock."+ clientSlabLockPosition.toString()), true);
 	}
 
 	@Override
