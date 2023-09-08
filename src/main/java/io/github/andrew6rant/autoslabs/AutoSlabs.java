@@ -4,14 +4,24 @@ import net.devtech.arrp.api.RRPCallback;
 import net.devtech.arrp.api.RuntimeResourcePack;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
 import virtuoel.statement.api.StateRefresher;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.github.andrew6rant.autoslabs.config.ServerConfig.dumpResources;
 
 public class AutoSlabs implements ModInitializer {
 	public static final RuntimeResourcePack AUTO_SLABS_RESOURCES = RuntimeResourcePack.create("autoslabs:resources", 15);
+
+	public static final Map<PlayerEntity, SlabLockEnum> slabLockPosition = new HashMap<>();
 
 	@Override
 	public void onInitialize() {
@@ -31,5 +41,10 @@ public class AutoSlabs implements ModInitializer {
 		if (dumpResources) {
 			AUTO_SLABS_RESOURCES.dump();
 		}
+
+		ServerPlayNetworking.registerGlobalReceiver(new Identifier("autoslabs", "slab_lock"), (server, player, handler, buf, responseSender) -> {
+			SlabLockEnum slabLockBuf = buf.readEnumConstant(SlabLockEnum.class);
+			slabLockPosition.put(player, slabLockBuf);
+		});
 	}
 }

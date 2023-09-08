@@ -21,8 +21,8 @@ public enum SlabLockEnum {
         return POSITION_VALUES[(ordinal() - 1  + POSITION_VALUES.length) % POSITION_VALUES.length];
     }
 
-    public SlabLockEnum loop(MinecraftClient client) {
-        if (client.options.sneakKey.isPressed()) {
+    public SlabLockEnum loop(boolean sneaking) {
+        if (sneaking) {
             return loopBackward();
         } else {
             return loopForward();

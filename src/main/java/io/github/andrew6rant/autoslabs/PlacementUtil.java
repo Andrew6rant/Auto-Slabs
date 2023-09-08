@@ -218,13 +218,16 @@ public class PlacementUtil {
     }
 
     public static boolean canReplace(BlockState state, ItemPlacementContext context) {
+        PlayerEntity player = context.getPlayer();
+        if (player == null) return false;
+        if (!AutoSlabs.slabLockPosition.getOrDefault(player, SlabLockEnum.DEFAULT_ALL).equals(SlabLockEnum.DEFAULT_ALL)) {
+            return false;
+        }
         ItemStack itemStack = context.getStack();
         SlabType slabType = state.get(TYPE);
-        PlayerEntity entity = context.getPlayer();
-        if (entity == null) return false;
         if (slabType != SlabType.DOUBLE && itemStack.isOf(state.getBlock().asItem())) {
             if (context.canReplaceExisting()) {
-                BlockHitResult blockHitResult = PlacementUtil.calcRaycast(entity);
+                BlockHitResult blockHitResult = PlacementUtil.calcRaycast(player);
                 HitPart part = getHitPart(blockHitResult);
                 boolean topHalfX = context.getHitPos().x - (double) context.getBlockPos().getX() > 0.5;
                 boolean topHalfY = context.getHitPos().y - (double) context.getBlockPos().getY() > 0.5;
@@ -274,9 +277,31 @@ public class PlacementUtil {
     }
 
     public static BlockState calcPlacementState(ItemPlacementContext ctx, BlockState state) {
+        PlayerEntity player = ctx.getPlayer();
+        if (player == null) return null;
         BlockPos blockPos = ctx.getBlockPos();
+        FluidState fluidState = ctx.getWorld().getFluidState(blockPos);
+        switch (AutoSlabs.slabLockPosition.getOrDefault(player, SlabLockEnum.DEFAULT_ALL)) {
+            case BOTTOM_SLAB -> {
+                return state.with(TYPE, SlabType.BOTTOM).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+            }
+            case TOP_SLAB -> {
+                return state.with(TYPE, SlabType.TOP).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+            }
+            case NORTH_SLAB_VERTICAL -> {
+                return state.with(TYPE, SlabType.TOP).with(VERTICAL_TYPE, NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+            }
+            case SOUTH_SLAB_VERTICAL -> {
+                return state.with(TYPE, SlabType.BOTTOM).with(VERTICAL_TYPE, NORTH_SOUTH).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+            }
+            case EAST_SLAB_VERTICAL -> {
+                return state.with(TYPE, SlabType.TOP).with(VERTICAL_TYPE, EAST_WEST).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+            }
+            case WEST_SLAB_VERTICAL -> {
+                return state.with(TYPE, SlabType.BOTTOM).with(VERTICAL_TYPE, EAST_WEST).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+            }
+        }
         BlockState blockState = ctx.getWorld().getBlockState(blockPos);
-
         // horrendous hack to make the client think that it can place down a slab
         // without visual desync or server-client communication
         // (light blocks with a level of 0 are completely invisible and also have no hitbox
@@ -288,12 +313,8 @@ public class PlacementUtil {
                 return Blocks.LIGHT.getDefaultState().with(LEVEL_15, 0);
             }
         }
-
         Direction ctxSide = ctx.getSide();
-        FluidState fluidState = ctx.getWorld().getFluidState(blockPos);
-        PlayerEntity entity = ctx.getPlayer();
-        if (entity == null) return null;
-        BlockHitResult blockHitResult = PlacementUtil.calcRaycast(entity);
+        BlockHitResult blockHitResult = PlacementUtil.calcRaycast(player);
         HitPart part = getHitPart(blockHitResult);
         return switch (ctxSide) {
             case UP -> calcUpPlacement(blockState, state, part, fluidState);

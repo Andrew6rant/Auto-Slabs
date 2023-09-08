@@ -36,10 +36,10 @@ public class AutoSlabsClient implements ClientModInitializer {
 		ClientPlayNetworking.send(new Identifier("autoslabs", "slab_lock"), buf);
 	}
 
-	private void setKeybind(SlabLockEnum lockedPosition, MinecraftClient client) {
-		slabLockPosition = slabLockPosition.loop(client);
+	private void setKeybind(MinecraftClient client) {
+		slabLockPosition = slabLockPosition.loop(client.options.sneakKey.isPressed());
 		sendKeybind(slabLockPosition);
-		client.player.sendMessage(Text.translatable("text.autoslabs.slab_lock."+lockedPosition.toString()), true);
+		client.player.sendMessage(Text.translatable("text.autoslabs.slab_lock."+slabLockPosition.toString()), true);
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class AutoSlabsClient implements ClientModInitializer {
 					ItemStack heldItem = client.player.getStackInHand(client.player.getActiveHand());
 					if (heldItem != null && !heldItem.isEmpty() && heldItem.getItem() instanceof BlockItem && ((BlockItem) heldItem.getItem()).getBlock() instanceof SlabBlock) {
 						validKeyPress = false;
-						setKeybind(slabLockPosition, client);
+						setKeybind(client);
 					}
 				}
 				if (!SLAB_LOCK_KEYBIND.isPressed() && !validKeyPress) {
