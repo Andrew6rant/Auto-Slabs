@@ -1,13 +1,20 @@
 package io.github.andrew6rant.autoslabs;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.enums.SlabType;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Direction;
@@ -21,6 +28,13 @@ import static io.github.andrew6rant.autoslabs.Util.*;
 
 // massive thanks to Schauweg for helping with some of this code
 public class RenderUtil {
+
+    public static void drawSlabIcon(PlayerEntity player, DrawContext context, int u, int v) {
+        ItemStack heldItem = player.getStackInHand(player.getActiveHand());
+        if (heldItem != null && !heldItem.isEmpty() && heldItem.getItem() instanceof BlockItem && ((BlockItem) heldItem.getItem()).getBlock() instanceof SlabBlock) {
+            context.drawTexture(new Identifier("autoslabs","textures/gui/autoslabs_position_lock.png"), (context.getScaledWindowWidth() - 15) / 2, (context.getScaledWindowHeight() - 42) / 2, u, v, 15, 15, 64, 64);
+        }
+    }
 
     public static void renderOverlay(MatrixStack matrices, VertexConsumer vertexConsumer, Vec3d camDif1, BlockState state, VoxelShape shape, HitResult hitResult) {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;

@@ -46,25 +46,12 @@ public class AutoSlabsClient implements ClientModInitializer {
 		client.player.sendMessage(Text.translatable("text.autoslabs.slab_lock."+ clientSlabLockPosition.toString()), true);
 	}
 
-	private void drawSlabIcon(DrawContext context, int u, int v) {
-		RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.ONE_MINUS_DST_COLOR, GlStateManager.DstFactor.ONE_MINUS_SRC_COLOR, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
-		context.drawTexture(new Identifier("autoslabs","textures/gui/autoslabs_position_lock.png"), (context.getScaledWindowWidth() - 15) / 2, (context.getScaledWindowHeight() - 42) / 2, u, v, 15, 15, 64, 64);
-		RenderSystem.defaultBlendFunc();
-	}
-
 	@Override
 	public void onInitializeClient() {
 		ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("autoslabs", "distinct_slabs"), container, Text.literal("Distinct Slabs (Built-In)"), ResourcePackActivationType.DEFAULT_ENABLED);
 
 		HudRenderCallback.EVENT.register((context, tickDelta) -> {
-			switch (clientSlabLockPosition) {
-				case BOTTOM_SLAB -> drawSlabIcon(context, 0, 0);
-				case TOP_SLAB -> drawSlabIcon(context, 16, 0);
-				case NORTH_SLAB_VERTICAL -> drawSlabIcon(context, 0, 16);
-				case SOUTH_SLAB_VERTICAL -> drawSlabIcon(context, 16, 16);
-				case EAST_SLAB_VERTICAL -> drawSlabIcon(context, 0, 32);
-				case WEST_SLAB_VERTICAL -> drawSlabIcon(context, 16, 32);
-			}
+
 		});
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
