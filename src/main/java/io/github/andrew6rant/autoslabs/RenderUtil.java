@@ -35,7 +35,7 @@ public class RenderUtil {
         }
     }
 
-    public static void renderOverlay(MatrixStack matrices, VertexConsumer vertexConsumer, Vec3d camDif1, BlockState state, VoxelShape shape, HitResult hitResult) {
+    public static void renderOverlay(MatrixStack matrices, VertexConsumer vertexConsumer, Vec3d camDif1, BlockState state, VoxelShape shape, HitResult hitResult, float red, float green, float blue, float alpha) {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (Block.getBlockFromItem(player.getStackInHand(player.getActiveHand()).getItem()) instanceof SlabBlock || (Block.getBlockFromItem(player.getOffHandStack().getItem()) instanceof SlabBlock && player.getMainHandStack().isEmpty())) {
             if (hitResult.getType() == HitResult.Type.BLOCK) {
@@ -45,32 +45,28 @@ public class RenderUtil {
                 Vec3d camDif = getCameraOffset(camDif1, shape, result.getSide());
 
                 if (state.getBlock() instanceof SlabBlock) {
-                    renderOverlayToDirection(state, result.getSide(), matrices, vertexConsumer, camDif, part);
+                    renderOverlayToDirection(state, result.getSide(), matrices, vertexConsumer, camDif, part, red, green, blue, alpha);
                 } else {
-                    renderOverlayToDirection(null, result.getSide(), matrices, vertexConsumer, camDif, part);
+                    renderOverlayToDirection(null, result.getSide(), matrices, vertexConsumer, camDif, part, red, green, blue, alpha);
                 }
             }
         }
     }
 
-    private static void drawLine(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Vector3f start, Vector3f end, Vec3d camDif) {
+    private static void drawLine(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Vector3f start, Vector3f end, Vec3d camDif, float red, float green, float blue, float alpha) {
         Vector3f normal = getNormalAngle(start, end);
-        float r = 0;
-        float g = 0;
-        float b = 0;
-        float a = 0.4f;
 
         Vector3f startRaw = new Vector3f((float) (start.x + camDif.x), (float) (start.y + camDif.y), (float) (start.z + camDif.z));
         Vector3f endRaw = new Vector3f((float) (end.x + camDif.x), (float) (end.y + camDif.y), (float) (end.z + camDif.z));
 
         vertexConsumer.vertex(entry.getPositionMatrix(), startRaw.x, startRaw.y, startRaw.z)
-                .color(r, g, b, a).normal(entry.getNormalMatrix(), normal.x, normal.y, normal.z).next();
+                .color(red, green, blue, alpha).normal(entry.getNormalMatrix(), normal.x, normal.y, normal.z).next();
 
         vertexConsumer.vertex(entry.getPositionMatrix(), endRaw.x, endRaw.y, endRaw.z)
-                .color(r, g, b, a).normal(entry.getNormalMatrix(), normal.x, normal.y, normal.z).next();
+                .color(red, green, blue, alpha).normal(entry.getNormalMatrix(), normal.x, normal.y, normal.z).next();
     }
 
-    private static void renderOverlayToDirection(BlockState state, Direction side, MatrixStack matrixStack, VertexConsumer vertexConsumer, Vec3d camDif, HitPart part) {
+    private static void renderOverlayToDirection(BlockState state, Direction side, MatrixStack matrixStack, VertexConsumer vertexConsumer, Vec3d camDif, HitPart part, float red, float green, float blue, float alpha) {
         Vector3f vecBottomLeft = null, vecBottomRight = null, vecTopLeft = null, vecTopRight = null,
                 vecCenterBottomLeft = null, vecCenterBottomRight = null, vecCenterTopLeft = null, vecCenterTopRight = null,
                 vecCenterMiddleLeft = null, vecCenterMiddleRight = null, vecCenterMiddleBottom = null, vecCenterMiddleTop = null;
@@ -177,261 +173,261 @@ public class RenderUtil {
                 // I have no idea why, but this code only works when
                 // in an if chain and not a switch statement
                 if (part == HitPart.CENTER) {
-                    drawCenterLines(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, camDif, slabType, verticalType, side);
+                    drawCenterLines(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, camDif, slabType, verticalType, side, red, green, blue, alpha);
                 }
                 else if (part == HitPart.BOTTOM) {
-                    drawTopBottomLines(entry, vertexConsumer, vecBottomLeft, vecBottomRight, vecCenterBottomLeft, vecCenterBottomRight, vecCenterMiddleBottom, slabType, verticalType, side, camDif);
+                    drawTopBottomLines(entry, vertexConsumer, vecBottomLeft, vecBottomRight, vecCenterBottomLeft, vecCenterBottomRight, vecCenterMiddleBottom, slabType, verticalType, side, camDif, red, green, blue, alpha);
                 }
                 else if (part == HitPart.TOP) {
-                    drawTopBottomLines(entry, vertexConsumer, vecTopLeft, vecTopRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleTop, slabType, verticalType, side, camDif);
+                    drawTopBottomLines(entry, vertexConsumer, vecTopLeft, vecTopRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleTop, slabType, verticalType, side, camDif, red, green, blue, alpha);
                 }
                 else if (part == HitPart.LEFT) {
-                    drawLeftRightLines(entry, vertexConsumer, vecBottomLeft, vecTopLeft, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleLeft, slabType, verticalType, side, camDif);
+                    drawLeftRightLines(entry, vertexConsumer, vecBottomLeft, vecTopLeft, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleLeft, slabType, verticalType, side, camDif, red, green, blue, alpha);
                 }
                 else if (part == HitPart.RIGHT) {
-                    drawLeftRightLines(entry, vertexConsumer, vecBottomRight, vecTopRight, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleRight, slabType, verticalType, side, camDif);
+                    drawLeftRightLines(entry, vertexConsumer, vecBottomRight, vecTopRight, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleRight, slabType, verticalType, side, camDif, red, green, blue, alpha);
                 }
             }
             case BOTTOM_SLAB -> {
                 switch (side) {
                     case UP, DOWN -> {
-                        drawCenterLines(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, camDif, slabType, verticalType, side);
+                        drawCenterLines(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, camDif, slabType, verticalType, side, red, green, blue, alpha);
                     }
                     case NORTH, SOUTH, EAST, WEST -> {
-                        drawTopBottomLines(entry, vertexConsumer, vecBottomLeft, vecBottomRight, vecCenterBottomLeft, vecCenterBottomRight, vecCenterMiddleBottom, slabType, verticalType, side, camDif);
+                        drawTopBottomLines(entry, vertexConsumer, vecBottomLeft, vecBottomRight, vecCenterBottomLeft, vecCenterBottomRight, vecCenterMiddleBottom, slabType, verticalType, side, camDif, red, green, blue, alpha);
                     }
                 }
             }
             case TOP_SLAB -> {
                 switch (side) {
                     case UP, DOWN -> {
-                        drawCenterLines(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, camDif, slabType, verticalType, side);
+                        drawCenterLines(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, camDif, slabType, verticalType, side, red, green, blue, alpha);
                     }
                     case NORTH, SOUTH, EAST, WEST -> {
-                        drawTopBottomLines(entry, vertexConsumer, vecTopLeft, vecTopRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleTop, slabType, verticalType, side, camDif);
+                        drawTopBottomLines(entry, vertexConsumer, vecTopLeft, vecTopRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleTop, slabType, verticalType, side, camDif, red, green, blue, alpha);
                     }
                 }
             }
             case NORTH_SLAB_VERTICAL -> {
                 switch (side) {
                     case UP, DOWN -> {
-                        drawTopBottomLines(entry, vertexConsumer, vecBottomLeft, vecBottomRight, vecCenterBottomLeft, vecCenterBottomRight, vecCenterMiddleBottom, slabType, verticalType, side, camDif);
+                        drawTopBottomLines(entry, vertexConsumer, vecBottomLeft, vecBottomRight, vecCenterBottomLeft, vecCenterBottomRight, vecCenterMiddleBottom, slabType, verticalType, side, camDif, red, green, blue, alpha);
                     }
                     case NORTH, SOUTH -> {
-                        drawCenterLines(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, camDif, slabType, verticalType, side);
+                        drawCenterLines(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, camDif, slabType, verticalType, side, red, green, blue, alpha);
                     }
                     case EAST -> {
-                        drawLeftRightLines(entry, vertexConsumer, vecBottomRight, vecTopRight, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleRight, slabType, verticalType, side, camDif);
+                        drawLeftRightLines(entry, vertexConsumer, vecBottomRight, vecTopRight, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleRight, slabType, verticalType, side, camDif, red, green, blue, alpha);
                     }
                     case WEST -> {
-                        drawLeftRightLines(entry, vertexConsumer, vecBottomLeft, vecTopLeft, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleLeft, slabType, verticalType, side, camDif);
+                        drawLeftRightLines(entry, vertexConsumer, vecBottomLeft, vecTopLeft, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleLeft, slabType, verticalType, side, camDif, red, green, blue, alpha);
                     }
                 }
             }
             case SOUTH_SLAB_VERTICAL -> {
                 switch (side) {
                     case UP, DOWN -> {
-                        drawTopBottomLines(entry, vertexConsumer, vecTopLeft, vecTopRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleTop, slabType, verticalType, side, camDif);
+                        drawTopBottomLines(entry, vertexConsumer, vecTopLeft, vecTopRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleTop, slabType, verticalType, side, camDif, red, green, blue, alpha);
                     }
                     case NORTH, SOUTH -> {
-                        drawCenterLines(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, camDif, slabType, verticalType, side);
+                        drawCenterLines(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, camDif, slabType, verticalType, side, red, green, blue, alpha);
                     }
                     case EAST -> {
-                        drawLeftRightLines(entry, vertexConsumer, vecBottomLeft, vecTopLeft, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleLeft, slabType, verticalType, side, camDif);
+                        drawLeftRightLines(entry, vertexConsumer, vecBottomLeft, vecTopLeft, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleLeft, slabType, verticalType, side, camDif, red, green, blue, alpha);
                     }
                     case WEST -> {
-                        drawLeftRightLines(entry, vertexConsumer, vecBottomRight, vecTopRight, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleRight, slabType, verticalType, side, camDif);
+                        drawLeftRightLines(entry, vertexConsumer, vecBottomRight, vecTopRight, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleRight, slabType, verticalType, side, camDif, red, green, blue, alpha);
                     }
                 }
             }
             case EAST_SLAB_VERTICAL -> {
                 switch (side) {
                     case UP -> {
-                        drawLeftRightLines(entry, vertexConsumer, vecBottomLeft, vecTopLeft, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleLeft, slabType, verticalType, side, camDif);
+                        drawLeftRightLines(entry, vertexConsumer, vecBottomLeft, vecTopLeft, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleLeft, slabType, verticalType, side, camDif, red, green, blue, alpha);
                     }
                     case DOWN -> {
-                        drawLeftRightLines(entry, vertexConsumer, vecBottomRight, vecTopRight, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleRight, slabType, verticalType, side, camDif);
+                        drawLeftRightLines(entry, vertexConsumer, vecBottomRight, vecTopRight, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleRight, slabType, verticalType, side, camDif, red, green, blue, alpha);
                     }
                     case EAST, WEST -> {
-                        drawCenterLines(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, camDif, slabType, verticalType, side);
+                        drawCenterLines(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, camDif, slabType, verticalType, side, red, green, blue, alpha);
                     }
                     case NORTH -> {
-                        drawLeftRightLines(entry, vertexConsumer, vecBottomLeft, vecTopLeft, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleLeft, slabType, verticalType, side, camDif);
+                        drawLeftRightLines(entry, vertexConsumer, vecBottomLeft, vecTopLeft, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleLeft, slabType, verticalType, side, camDif, red, green, blue, alpha);
                     }
                     case SOUTH -> {
-                        drawLeftRightLines(entry, vertexConsumer, vecBottomRight, vecTopRight, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleRight, slabType, verticalType, side, camDif);
+                        drawLeftRightLines(entry, vertexConsumer, vecBottomRight, vecTopRight, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleRight, slabType, verticalType, side, camDif, red, green, blue, alpha);
                     }
                 }
             }
             case WEST_SLAB_VERTICAL -> {
                 switch (side) {
                     case UP -> {
-                        drawLeftRightLines(entry, vertexConsumer, vecBottomRight, vecTopRight, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleRight, slabType, verticalType, side, camDif);
+                        drawLeftRightLines(entry, vertexConsumer, vecBottomRight, vecTopRight, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleRight, slabType, verticalType, side, camDif, red, green, blue, alpha);
                     }
                     case DOWN -> {
-                        drawLeftRightLines(entry, vertexConsumer, vecBottomLeft, vecTopLeft, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleLeft, slabType, verticalType, side, camDif);
+                        drawLeftRightLines(entry, vertexConsumer, vecBottomLeft, vecTopLeft, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleLeft, slabType, verticalType, side, camDif, red, green, blue, alpha);
                     }
                     case EAST, WEST -> {
-                        drawCenterLines(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, camDif, slabType, verticalType, side);
+                        drawCenterLines(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, vecCenterMiddleBottom, vecCenterMiddleTop, camDif, slabType, verticalType, side, red, green, blue, alpha);
                     }
                     case NORTH -> {
-                        drawLeftRightLines(entry, vertexConsumer, vecBottomRight, vecTopRight, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleRight, slabType, verticalType, side, camDif);
+                        drawLeftRightLines(entry, vertexConsumer, vecBottomRight, vecTopRight, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleRight, slabType, verticalType, side, camDif, red, green, blue, alpha);
                     }
                     case SOUTH -> {
-                        drawLeftRightLines(entry, vertexConsumer, vecBottomLeft, vecTopLeft, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleLeft, slabType, verticalType, side, camDif);
+                        drawLeftRightLines(entry, vertexConsumer, vecBottomLeft, vecTopLeft, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleLeft, slabType, verticalType, side, camDif, red, green, blue, alpha);
                     }
                 }
             }
         }
     }
 
-    private static void drawLeftRightLines(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vector3f vecCenterMiddleCorner, SlabType slabType, VerticalType verticalType, Direction side, Vec3d camDif) {
+    private static void drawLeftRightLines(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vector3f vecCenterMiddleCorner, SlabType slabType, VerticalType verticalType, Direction side, Vec3d camDif, float red, float green, float blue, float alpha) {
         if (verticalType != null && slabType != null) {
             switch (verticalType) {
                 case FALSE -> {
                     switch (slabType) {
                         case BOTTOM, TOP -> {
                             if (side == Direction.DOWN || side == Direction.UP) {
-                                drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif);
+                                drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif, red, green, blue, alpha);
                             } else {
-                                drawInternal(entry, vertexConsumer, vecEndCorner, vecStartCorner, vecCenterEndCorner, vecCenterStartCorner, vecCenterMiddleCorner, slabType, camDif);
+                                drawInternal(entry, vertexConsumer, vecEndCorner, vecStartCorner, vecCenterEndCorner, vecCenterStartCorner, vecCenterMiddleCorner, slabType, camDif, red, green, blue, alpha);
                             }
                         }
-                        case DOUBLE -> drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif);
+                        case DOUBLE -> drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif, red, green, blue, alpha);
                     }
                 }
                 case NORTH_SOUTH -> {
                     switch (slabType) {
                         case BOTTOM, TOP -> {
                             if (side == Direction.DOWN || side == Direction.UP) {
-                                drawInternal(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, vecCenterMiddleCorner, slabType, camDif);
+                                drawInternal(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, vecCenterMiddleCorner, slabType, camDif, red, green, blue, alpha);
                             } else {
-                                drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif);
+                                drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif, red, green, blue, alpha);
                             }
                         }
-                        case DOUBLE -> drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif);
+                        case DOUBLE -> drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif, red, green, blue, alpha);
                     }
                 }
-                case EAST_WEST -> drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif);
+                case EAST_WEST -> drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif, red, green, blue, alpha);
             }
         } else {
-            drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif);
+            drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif, red, green, blue, alpha);
         }
     }
 
-    private static void drawCenterLines(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Vector3f vecCenterBottomLeft, Vector3f vecCenterBottomRight, Vector3f vecCenterTopLeft, Vector3f vecCenterTopRight, Vector3f vecCenterMiddleLeft, Vector3f vecCenterMiddleRight, Vector3f vecCenterMiddleBottom, Vector3f vecCenterMiddleTop, Vec3d camDif, SlabType slabType, VerticalType verticalType, Direction side) {
+    private static void drawCenterLines(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Vector3f vecCenterBottomLeft, Vector3f vecCenterBottomRight, Vector3f vecCenterTopLeft, Vector3f vecCenterTopRight, Vector3f vecCenterMiddleLeft, Vector3f vecCenterMiddleRight, Vector3f vecCenterMiddleBottom, Vector3f vecCenterMiddleTop, Vec3d camDif, SlabType slabType, VerticalType verticalType, Direction side, float red, float green, float blue, float alpha) {
         if (verticalType != null && slabType != null) {
             switch (verticalType) {
                 case FALSE -> {
                     switch (slabType) {
                         case BOTTOM, TOP -> {
                             if (side == Direction.DOWN || side == Direction.UP) {
-                                drawDefaultSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, camDif);
+                                drawDefaultSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, camDif, red, green, blue, alpha);
                             } else {
-                                drawInternalSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, slabType, camDif);
+                                drawInternalSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, vecCenterMiddleLeft, vecCenterMiddleRight, slabType, camDif, red, green, blue, alpha);
                             }
                         }
-                        case DOUBLE -> drawDefaultSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, camDif);
+                        case DOUBLE -> drawDefaultSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, camDif, red, green, blue, alpha);
                     }
                 }
                 case NORTH_SOUTH -> {
                     switch (slabType) {
                         case BOTTOM, TOP -> {
                             switch (side) {
-                                case DOWN, UP -> drawInternalSquare(entry, vertexConsumer, vecCenterTopLeft, vecCenterTopRight, vecCenterBottomLeft, vecCenterBottomRight, vecCenterMiddleLeft, vecCenterMiddleRight, slabType, camDif);
-                                case NORTH, SOUTH -> drawDefaultSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, camDif);
-                                case EAST -> drawInternalSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterTopLeft, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleBottom, vecCenterMiddleTop, slabType, camDif);
-                                case WEST -> drawInternalSquare(entry, vertexConsumer, vecCenterBottomRight, vecCenterTopRight, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleBottom, vecCenterMiddleTop, slabType, camDif);
+                                case DOWN, UP -> drawInternalSquare(entry, vertexConsumer, vecCenterTopLeft, vecCenterTopRight, vecCenterBottomLeft, vecCenterBottomRight, vecCenterMiddleLeft, vecCenterMiddleRight, slabType, camDif, red, green, blue, alpha);
+                                case NORTH, SOUTH -> drawDefaultSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, camDif, red, green, blue, alpha);
+                                case EAST -> drawInternalSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterTopLeft, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleBottom, vecCenterMiddleTop, slabType, camDif, red, green, blue, alpha);
+                                case WEST -> drawInternalSquare(entry, vertexConsumer, vecCenterBottomRight, vecCenterTopRight, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleBottom, vecCenterMiddleTop, slabType, camDif, red, green, blue, alpha);
                             }
                         }
-                        case DOUBLE -> drawDefaultSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, camDif);
+                        case DOUBLE -> drawDefaultSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, camDif, red, green, blue, alpha);
                     }
                 }
                 case EAST_WEST -> {
                     switch (slabType) {
                         case BOTTOM, TOP -> {
                             switch (side) {
-                                case EAST, WEST -> drawDefaultSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, camDif);
-                                case SOUTH, DOWN -> drawInternalSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterTopLeft, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleBottom, vecCenterMiddleTop, slabType, camDif);
-                                case NORTH, UP -> drawInternalSquare(entry, vertexConsumer, vecCenterBottomRight, vecCenterTopRight, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleBottom, vecCenterMiddleTop, slabType, camDif);
+                                case EAST, WEST -> drawDefaultSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, camDif, red, green, blue, alpha);
+                                case SOUTH, DOWN -> drawInternalSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterTopLeft, vecCenterBottomRight, vecCenterTopRight, vecCenterMiddleBottom, vecCenterMiddleTop, slabType, camDif, red, green, blue, alpha);
+                                case NORTH, UP -> drawInternalSquare(entry, vertexConsumer, vecCenterBottomRight, vecCenterTopRight, vecCenterBottomLeft, vecCenterTopLeft, vecCenterMiddleBottom, vecCenterMiddleTop, slabType, camDif, red, green, blue, alpha);
                             }
                         }
-                        case DOUBLE -> drawDefaultSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, camDif);
+                        case DOUBLE -> drawDefaultSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, camDif, red, green, blue, alpha);
                     }
                 }
             }
         } else {
-            drawDefaultSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, camDif);
+            drawDefaultSquare(entry, vertexConsumer, vecCenterBottomLeft, vecCenterBottomRight, vecCenterTopLeft, vecCenterTopRight, camDif, red, green, blue, alpha);
         }
     }
 
-    private static void drawTopBottomLines(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vector3f vecCenterMiddleCorner, SlabType slabType, VerticalType verticalType, Direction side, Vec3d camDif) {
+    private static void drawTopBottomLines(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vector3f vecCenterMiddleCorner, SlabType slabType, VerticalType verticalType, Direction side, Vec3d camDif, float red, float green, float blue, float alpha) {
         if (verticalType != null && slabType != null) {
             switch (verticalType) {
-                case FALSE -> drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif);
+                case FALSE -> drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif, red, green, blue, alpha);
                 case NORTH_SOUTH -> {
                     switch (slabType) {
                         case BOTTOM, TOP -> {
                             switch (side) {
-                                case DOWN, UP, NORTH, SOUTH -> drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif);
-                                case EAST -> drawInternal(entry, vertexConsumer, vecEndCorner, vecStartCorner, vecCenterEndCorner, vecCenterStartCorner, vecCenterMiddleCorner, slabType, camDif);
-                                case WEST -> drawInternal(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, vecCenterMiddleCorner, slabType, camDif);
+                                case DOWN, UP, NORTH, SOUTH -> drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif, red, green, blue, alpha);
+                                case EAST -> drawInternal(entry, vertexConsumer, vecEndCorner, vecStartCorner, vecCenterEndCorner, vecCenterStartCorner, vecCenterMiddleCorner, slabType, camDif, red, green, blue, alpha);
+                                case WEST -> drawInternal(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, vecCenterMiddleCorner, slabType, camDif, red, green, blue, alpha);
                             }
                         }
-                        case DOUBLE -> drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif);
+                        case DOUBLE -> drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif, red, green, blue, alpha);
                     }
                 }
                 case EAST_WEST -> {
                     switch (slabType) {
                         case BOTTOM, TOP -> {
                             switch (side) {
-                                case EAST, WEST -> drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif);
-                                case NORTH, UP -> drawInternal(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, vecCenterMiddleCorner, slabType, camDif);
-                                case SOUTH, DOWN -> drawInternal(entry, vertexConsumer, vecEndCorner, vecStartCorner, vecCenterEndCorner, vecCenterStartCorner, vecCenterMiddleCorner, slabType, camDif);
+                                case EAST, WEST -> drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif, red, green, blue, alpha);
+                                case NORTH, UP -> drawInternal(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, vecCenterMiddleCorner, slabType, camDif, red, green, blue, alpha);
+                                case SOUTH, DOWN -> drawInternal(entry, vertexConsumer, vecEndCorner, vecStartCorner, vecCenterEndCorner, vecCenterStartCorner, vecCenterMiddleCorner, slabType, camDif, red, green, blue, alpha);
                             }
                         }
-                        case DOUBLE -> drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif);
+                        case DOUBLE -> drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif, red, green, blue, alpha);
                     }
                 }
             }
         } else {
-            drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif);
+            drawDefaultLines(entry, vertexConsumer, vecStartCorner, vecEndCorner, vecCenterStartCorner, vecCenterEndCorner, camDif, red, green, blue, alpha);
         }
     }
 
-    private static void drawInternalSquare(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vector3f vecCenterMiddleStart, Vector3f vecCenterMiddleEnd, SlabType slabType, Vec3d camDif) {
+    private static void drawInternalSquare(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vector3f vecCenterMiddleStart, Vector3f vecCenterMiddleEnd, SlabType slabType, Vec3d camDif, float red, float green, float blue, float alpha) {
         if (Objects.equals(slabType, SlabType.TOP)) {
-            drawLine(entry, vertexConsumer, vecCenterMiddleStart, vecCenterStartCorner, camDif);
-            drawLine(entry, vertexConsumer, vecCenterStartCorner, vecCenterEndCorner, camDif);
-            drawLine(entry, vertexConsumer, vecCenterEndCorner, vecCenterMiddleEnd, camDif);
+            drawLine(entry, vertexConsumer, vecCenterMiddleStart, vecCenterStartCorner, camDif, red, green, blue, alpha);
+            drawLine(entry, vertexConsumer, vecCenterStartCorner, vecCenterEndCorner, camDif, red, green, blue, alpha);
+            drawLine(entry, vertexConsumer, vecCenterEndCorner, vecCenterMiddleEnd, camDif, red, green, blue, alpha);
         } else if (Objects.equals(slabType, SlabType.BOTTOM)) {
-            drawLine(entry, vertexConsumer, vecStartCorner, vecCenterMiddleStart, camDif);
-            drawLine(entry, vertexConsumer, vecStartCorner, vecEndCorner, camDif);
-            drawLine(entry, vertexConsumer, vecEndCorner, vecCenterMiddleEnd, camDif);
+            drawLine(entry, vertexConsumer, vecStartCorner, vecCenterMiddleStart, camDif, red, green, blue, alpha);
+            drawLine(entry, vertexConsumer, vecStartCorner, vecEndCorner, camDif, red, green, blue, alpha);
+            drawLine(entry, vertexConsumer, vecEndCorner, vecCenterMiddleEnd, camDif, red, green, blue, alpha);
         }
     }
 
-    private static void drawInternal(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vector3f vecCenterMiddleCorner, SlabType slabType, Vec3d camDif) {
+    private static void drawInternal(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vector3f vecCenterMiddleCorner, SlabType slabType, Vec3d camDif, float red, float green, float blue, float alpha) {
         if (Objects.equals(slabType, SlabType.BOTTOM)) {
-            drawLine(entry, vertexConsumer, vecEndCorner, vecCenterEndCorner, camDif);
-            drawLine(entry, vertexConsumer, vecCenterEndCorner, vecCenterMiddleCorner, camDif);
+            drawLine(entry, vertexConsumer, vecEndCorner, vecCenterEndCorner, camDif, red, green, blue, alpha);
+            drawLine(entry, vertexConsumer, vecCenterEndCorner, vecCenterMiddleCorner, camDif, red, green, blue, alpha);
         } else if (Objects.equals(slabType, SlabType.TOP)) {
-            drawLine(entry, vertexConsumer, vecStartCorner, vecCenterStartCorner, camDif);
-            drawLine(entry, vertexConsumer, vecCenterStartCorner, vecCenterMiddleCorner, camDif);
+            drawLine(entry, vertexConsumer, vecStartCorner, vecCenterStartCorner, camDif, red, green, blue, alpha);
+            drawLine(entry, vertexConsumer, vecCenterStartCorner, vecCenterMiddleCorner, camDif, red, green, blue, alpha);
         }
     }
 
-    private static void drawDefaultLines(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vec3d camDif) {
-        drawLine(entry, vertexConsumer, vecStartCorner, vecCenterStartCorner, camDif);
-        drawLine(entry, vertexConsumer, vecEndCorner, vecCenterEndCorner, camDif);
-        drawLine(entry, vertexConsumer, vecCenterStartCorner, vecCenterEndCorner, camDif);
+    private static void drawDefaultLines(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vec3d camDif, float red, float green, float blue, float alpha) {
+        drawLine(entry, vertexConsumer, vecStartCorner, vecCenterStartCorner, camDif, red, green, blue, alpha);
+        drawLine(entry, vertexConsumer, vecEndCorner, vecCenterEndCorner, camDif, red, green, blue, alpha);
+        drawLine(entry, vertexConsumer, vecCenterStartCorner, vecCenterEndCorner, camDif, red, green, blue, alpha);
     }
 
-    private static void drawDefaultSquare(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vec3d camDif) {
-        drawLine(entry, vertexConsumer, vecStartCorner, vecEndCorner, camDif);
-        drawLine(entry, vertexConsumer, vecStartCorner, vecCenterStartCorner, camDif);
-        drawLine(entry, vertexConsumer, vecEndCorner, vecCenterEndCorner, camDif);
-        drawLine(entry, vertexConsumer, vecCenterStartCorner, vecCenterEndCorner, camDif);
+    private static void drawDefaultSquare(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Vector3f vecStartCorner, Vector3f vecEndCorner, Vector3f vecCenterStartCorner, Vector3f vecCenterEndCorner, Vec3d camDif, float red, float green, float blue, float alpha) {
+        drawLine(entry, vertexConsumer, vecStartCorner, vecEndCorner, camDif, red, green, blue, alpha);
+        drawLine(entry, vertexConsumer, vecStartCorner, vecCenterStartCorner, camDif, red, green, blue, alpha);
+        drawLine(entry, vertexConsumer, vecEndCorner, vecCenterEndCorner, camDif, red, green, blue, alpha);
+        drawLine(entry, vertexConsumer, vecCenterStartCorner, vecCenterEndCorner, camDif, red, green, blue, alpha);
     }
 
 }

@@ -9,6 +9,7 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
@@ -16,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -30,13 +32,22 @@ public class WorldRendererMixin {
 
     @Shadow @Nullable private ClientWorld world;
 
+    @Unique private static HitResult autoslabs$captureCrosshairTarget;
+    @Unique private static BlockState autoslabs$captureBlockState;
+
     @Inject(method = "drawBlockOutline(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/entity/Entity;DDDLnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)V", at = @At("HEAD"))
     private void autoslabs$drawBlockOutline(MatrixStack matrices, VertexConsumer vertexConsumer, Entity entity, double cameraX, double cameraY, double cameraZ, BlockPos pos, BlockState state, CallbackInfo ci) {
-        if (!showEnhancedSlabLines) return;
-        if (clientSlabLockPosition.equals(SlabLockEnum.VANILLA_PLACEMENT)) return;
-        Vec3d camDif = new Vec3d((double)pos.getX() - cameraX, (double)pos.getY() - cameraY, (double)pos.getZ() - cameraZ);
-        VoxelShape shape = state.getOutlineShape(this.world, pos, ShapeContext.of(entity));
-        RenderUtil.renderOverlay(matrices, vertexConsumer, camDif, state, shape, this.client.crosshairTarget);
+        autoslabs$captureCrosshairTarget = this.client.crosshairTarget;
+        autoslabs$captureBlockState = state;
     }
 
+    @Inject(method = "drawCuboidShapeOutline(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/util/shape/VoxelShape;DDDFFFF)V", at = @At("HEAD"))
+    private static void autoslabs$drawBlockOutline(MatrixStack matrices, VertexConsumer vertexConsumer, VoxelShape shape, double offsetX, double offsetY, double offsetZ, float red, float green, float blue, float alpha, CallbackInfo ci) {
+        if (!showEnhancedSlabLines) return;
+        if (clientSlabLockPosition.equals(SlabLockEnum.VANILLA_PLACEMENT)) return;
+        Vec3d camDif = new Vec3d(offsetX, offsetY, offsetZ);
+        if (autoslabs$captureCrosshairTarget != null && autoslabs$captureBlockState != null) {
+            RenderUtil.renderOverlay(matrices, vertexConsumer, camDif, autoslabs$captureBlockState, shape, autoslabs$captureCrosshairTarget, red, green, blue, alpha);
+        }
+    }
 }
