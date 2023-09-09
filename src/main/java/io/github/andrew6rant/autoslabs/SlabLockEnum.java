@@ -1,9 +1,7 @@
 package io.github.andrew6rant.autoslabs;
 
-import net.minecraft.client.MinecraftClient;
-
 public enum SlabLockEnum {
-    DEFAULT_ALL,
+    DEFAULT_AUTOSLABS,
     BOTTOM_SLAB,
     TOP_SLAB,
     NORTH_SLAB_VERTICAL,

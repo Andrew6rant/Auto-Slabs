@@ -220,7 +220,7 @@ public class PlacementUtil {
     public static boolean canReplace(BlockState state, ItemPlacementContext context) {
         PlayerEntity player = context.getPlayer();
         if (player == null) return false;
-        if (!AutoSlabs.slabLockPosition.getOrDefault(player, SlabLockEnum.DEFAULT_ALL).equals(SlabLockEnum.DEFAULT_ALL)) {
+        if (!AutoSlabs.slabLockPosition.getOrDefault(player, SlabLockEnum.DEFAULT_AUTOSLABS).equals(SlabLockEnum.DEFAULT_AUTOSLABS)) {
             return false;
         }
         ItemStack itemStack = context.getStack();
@@ -281,7 +281,7 @@ public class PlacementUtil {
         if (player == null) return null;
         BlockPos blockPos = ctx.getBlockPos();
         FluidState fluidState = ctx.getWorld().getFluidState(blockPos);
-        switch (AutoSlabs.slabLockPosition.getOrDefault(player, SlabLockEnum.DEFAULT_ALL)) {
+        switch (AutoSlabs.slabLockPosition.getOrDefault(player, SlabLockEnum.DEFAULT_AUTOSLABS)) {
             case BOTTOM_SLAB -> {
                 return state.with(TYPE, SlabType.BOTTOM).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
             }
