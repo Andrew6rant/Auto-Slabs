@@ -112,10 +112,25 @@ public class SlabBlockMixin extends Block implements Waterloggable {
 
 	@Override
 	public BlockState mirror(BlockState state, BlockMirror mirror) {
+		SlabType slabType = state.get(TYPE);
+		if (slabType == null) return super.mirror(state, mirror);
+		if (slabType == SlabType.DOUBLE) return state;
+
 		VerticalType verticalType = state.get(VERTICAL_TYPE);
 		if (verticalType == null) return super.mirror(state, mirror);
 		if (verticalType == FALSE || mirror == BlockMirror.NONE) return state;
-		return state.with(TYPE, state.get(TYPE) == TOP ? BOTTOM : TOP);
+
+		return switch (mirror) {
+			case LEFT_RIGHT -> switch (verticalType) {
+				case EAST_WEST -> state;
+				default -> state.with(TYPE, state.get(TYPE) == TOP ? BOTTOM : TOP);
+			};
+			case FRONT_BACK -> switch (verticalType) {
+				case NORTH_SOUTH -> state;
+				default -> state.with(TYPE, state.get(TYPE) == TOP ? BOTTOM : TOP);
+			};
+			default -> state;
+		};
 	}
 
 }
