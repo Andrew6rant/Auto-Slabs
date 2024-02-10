@@ -11,6 +11,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -25,6 +27,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static io.github.andrew6rant.autoslabs.Util.TYPE;
 import static io.github.andrew6rant.autoslabs.Util.VERTICAL_TYPE;
+import static io.github.andrew6rant.autoslabs.VerticalType.*;
+import static net.minecraft.block.enums.SlabType.BOTTOM;
 import static net.minecraft.block.enums.SlabType.TOP;
 
 @Mixin(SlabBlock.class)
@@ -81,6 +85,52 @@ public class SlabBlockMixin extends Block implements Waterloggable {
 		} else {
 			super.afterBreak(world, player, pos, state.with(TYPE, TOP), blockEntity, stack);
 		}
+	}
+
+	@Override
+	public BlockState rotate(BlockState state, BlockRotation rotation) {
+		SlabType slabType = state.get(TYPE);
+		if (slabType == null) return super.rotate(state, rotation);
+		if (slabType == SlabType.DOUBLE) return state;
+
+		VerticalType verticalType = state.get(VERTICAL_TYPE);
+		if (verticalType == null) return super.rotate(state, rotation);
+		if (verticalType == FALSE || rotation == BlockRotation.NONE) return state;
+
+		return switch (rotation) {
+            case CLOCKWISE_90 -> state
+                    .with(VERTICAL_TYPE, verticalType == NORTH_SOUTH ? EAST_WEST : NORTH_SOUTH)
+                    .with(TYPE, verticalType == EAST_WEST ? (slabType == TOP ? BOTTOM : TOP) : slabType);
+			case CLOCKWISE_180 -> state
+					.with(TYPE, slabType == TOP ? BOTTOM : TOP);
+			case COUNTERCLOCKWISE_90 -> state
+					.with(VERTICAL_TYPE, verticalType == NORTH_SOUTH ? EAST_WEST : NORTH_SOUTH)
+					.with(TYPE, verticalType == NORTH_SOUTH ? (slabType == TOP ? BOTTOM : TOP) : slabType);
+            default -> state;
+        };
+    }
+
+	@Override
+	public BlockState mirror(BlockState state, BlockMirror mirror) {
+		SlabType slabType = state.get(TYPE);
+		if (slabType == null) return super.mirror(state, mirror);
+		if (slabType == SlabType.DOUBLE) return state;
+
+		VerticalType verticalType = state.get(VERTICAL_TYPE);
+		if (verticalType == null) return super.mirror(state, mirror);
+		if (verticalType == FALSE || mirror == BlockMirror.NONE) return state;
+
+		return switch (mirror) {
+			case LEFT_RIGHT -> switch (verticalType) {
+				case EAST_WEST -> state;
+				default -> state.with(TYPE, state.get(TYPE) == TOP ? BOTTOM : TOP);
+			};
+			case FRONT_BACK -> switch (verticalType) {
+				case NORTH_SOUTH -> state;
+				default -> state.with(TYPE, state.get(TYPE) == TOP ? BOTTOM : TOP);
+			};
+			default -> state;
+		};
 	}
 
 }
